@@ -1,0 +1,17 @@
+{
+  "model": {
+    "id": "string",
+    "title": "string",
+    "imageUrl": "string",
+    "category": "string",
+    "isActive": "boolean",
+    "order": "number"
+  },
+  "dto": {
+    "title": "Family Portrait",
+    "imageUrl": "/images/family.jpg",
+    "category": "family",
+    "isActive": true,
+    "order": 1
+  }
+} 

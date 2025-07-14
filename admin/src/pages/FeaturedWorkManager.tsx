@@ -8,7 +8,7 @@ const FeaturedWorkManager: React.FC = () => {
     {
       id: '1',
       title: 'Family Portrait',
-      imageUrl: '/api/placeholder/600/400',
+      imageUrl: `${process.env.REACT_APP_API_URL || ''}/placeholder/600/400`,
       category: 'family',
       isActive: true,
       order: 1
@@ -16,7 +16,7 @@ const FeaturedWorkManager: React.FC = () => {
     {
       id: '2',
       title: 'Couple Session',
-      imageUrl: '/api/placeholder/600/400',
+      imageUrl: `${process.env.REACT_APP_API_URL || ''}/placeholder/600/400`,
       category: 'couple',
       isActive: true,
       order: 2
@@ -24,7 +24,7 @@ const FeaturedWorkManager: React.FC = () => {
     {
       id: '3',
       title: 'Individual Portrait',
-      imageUrl: '/api/placeholder/600/400',
+      imageUrl: `${process.env.REACT_APP_API_URL || ''}/placeholder/600/400`,
       category: 'portrait',
       isActive: true,
       order: 3

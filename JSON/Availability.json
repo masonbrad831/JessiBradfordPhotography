@@ -1,0 +1,20 @@
+{
+  "model": {
+    "date": "string (ISO date)",
+    "isAvailable": "boolean",
+    "timeSlots": [
+      {
+        "time": "string",
+        "isAvailable": "boolean"
+      }
+    ]
+  },
+  "dto": {
+    "date": "2024-08-01",
+    "isAvailable": true,
+    "timeSlots": [
+      { "time": "9:00 AM", "isAvailable": true },
+      { "time": "10:00 AM", "isAvailable": false }
+    ]
+  }
+} 

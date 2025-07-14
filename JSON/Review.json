@@ -1,0 +1,18 @@
+{
+  "model": {
+    "id": "string",
+    "clientName": "string",
+    "rating": "number",
+    "comment": "string",
+    "date": "string (ISO date)",
+    "serviceType": "string",
+    "imageUrl": "string (optional)"
+  },
+  "dto": {
+    "clientName": "Sarah M.",
+    "rating": 5,
+    "comment": "Jessi captured our engagement perfectly! The photos are stunning and truly reflect our personalities.",
+    "date": "2024-01-20",
+    "serviceType": "Engagement Session"
+  }
+} 

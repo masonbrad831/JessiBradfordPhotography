@@ -8,21 +8,21 @@ const SlideshowManager: React.FC = () => {
     {
       id: '1',
       title: 'Hero Image 1',
-      imageUrl: '/images/hero1.jpg',
+      imageUrl: `${process.env.REACT_APP_CLIENT_URL || ''}/images/hero1.jpg`,
       order: 1,
       isActive: true
     },
     {
       id: '2',
       title: 'Hero Image 2',
-      imageUrl: '/images/hero2.jpg',
+      imageUrl: `${process.env.REACT_APP_CLIENT_URL || ''}/images/hero2.jpg`,
       order: 2,
       isActive: true
     },
     {
       id: '3',
       title: 'Hero Image 3',
-      imageUrl: '/images/hero3.jpg',
+      imageUrl: `${process.env.REACT_APP_CLIENT_URL || ''}/images/hero3.jpg`,
       order: 3,
       isActive: true
     }

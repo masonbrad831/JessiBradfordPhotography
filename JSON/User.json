@@ -1,0 +1,11 @@
+{
+  "model": {
+    "id": "string",
+    "username": "string",
+    "role": "string"
+  },
+  "dto": {
+    "username": "admin",
+    "role": "admin"
+  }
+} 

@@ -1,0 +1,15 @@
+{
+  "model": {
+    "id": "string",
+    "name": "string",
+    "description": "string",
+    "coverImage": "string",
+    "photoCount": "number"
+  },
+  "dto": {
+    "name": "Family",
+    "description": "Family photo sessions",
+    "coverImage": "/images/family.jpg",
+    "photoCount": 30
+  }
+} 

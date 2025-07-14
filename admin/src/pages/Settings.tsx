@@ -43,7 +43,7 @@ const Settings: React.FC = () => {
               </label>
               <input
                 type="text"
-                defaultValue="Jessi Bradford Photography"
+                defaultValue={process.env.REACT_APP_BUSINESS_NAME || "Jessi Bradford Photography"}
                 className="input-field"
               />
             </div>
@@ -56,7 +56,7 @@ const Settings: React.FC = () => {
                 <Mail className="w-4 h-4 text-gray-400" />
                 <input
                   type="email"
-                  defaultValue="jessi@jessibradfordphotography.com"
+                  defaultValue={process.env.REACT_APP_ADMIN_EMAIL || "jessi@jessibradfordphotography.com"}
                   className="input-field"
                 />
               </div>
@@ -84,7 +84,7 @@ const Settings: React.FC = () => {
                 <MapPin className="w-4 h-4 text-gray-400" />
                 <input
                   type="text"
-                  defaultValue="Salina, Utah"
+                  defaultValue={process.env.REACT_APP_SITE_URL || "Salina, Utah"}
                   className="input-field"
                 />
               </div>

@@ -1,0 +1,18 @@
+{
+  "model": {
+    "name": "string",
+    "email": "string",
+    "phone": "string",
+    "service": "string",
+    "date": "string (ISO date)",
+    "message": "string"
+  },
+  "dto": {
+    "name": "Jane Doe",
+    "email": "jane@example.com",
+    "phone": "555-1234",
+    "service": "Family Session",
+    "date": "2024-08-01",
+    "message": "I would like to book a family session."
+  }
+} 

@@ -1,0 +1,15 @@
+{
+  "model": {
+    "id": "string",
+    "title": "string",
+    "imageUrl": "string",
+    "order": "number",
+    "isActive": "boolean"
+  },
+  "dto": {
+    "title": "Hero Image 1",
+    "imageUrl": "/images/hero1.jpg",
+    "order": 1,
+    "isActive": true
+  }
+} 

@@ -1,0 +1,26 @@
+{
+  "model": {
+    "id": "string",
+    "clientName": "string",
+    "sessionDate": "string (ISO date)",
+    "category": "string",
+    "photos": ["Photo"],
+    "password": "string (optional)"
+  },
+  "dto": {
+    "clientName": "Sarah & Mike",
+    "sessionDate": "2024-01-15",
+    "category": "Engagement",
+    "photos": [
+      {
+        "id": "1",
+        "title": "Engagement Photo 1",
+        "description": "A beautiful engagement photo.",
+        "imageUrl": "/images/engagement1.jpg",
+        "category": "engagement",
+        "tags": ["outdoor"]
+      }
+    ],
+    "password": "secret123"
+  }
+} 

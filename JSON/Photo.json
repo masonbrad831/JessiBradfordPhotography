@@ -1,0 +1,19 @@
+{
+  "model": {
+    "id": "string",
+    "title": "string",
+    "description": "string",
+    "imageUrl": "string",
+    "category": "portrait | couple | family | engagement | wedding",
+    "featured": "boolean (optional)",
+    "tags": ["string"]
+  },
+  "dto": {
+    "title": "string",
+    "description": "string",
+    "imageUrl": "string",
+    "category": "portrait",
+    "featured": false,
+    "tags": ["outdoor", "natural light"]
+  }
+} 

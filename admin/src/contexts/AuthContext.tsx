@@ -31,14 +31,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const token = localStorage.getItem('admin_token');
     if (token) {
       setIsAuthenticated(true);
-      // TODO: Validate token with backend
+      // TODO: Validate token with backend using process.env.REACT_APP_API_URL
     }
   }, []);
 
   const login = async (username: string, password: string): Promise<boolean> => {
     try {
-      // TODO: Replace with actual API call
-      if (username === 'admin' && password === 'password') {
+      // TODO: Replace with actual API call using process.env.REACT_APP_API_URL
+      const demoUser = process.env.REACT_APP_DEMO_USERNAME || 'admin';
+      const demoPass = process.env.REACT_APP_DEMO_PASSWORD || 'password';
+      if (username === demoUser && password === demoPass) {
         const token = 'dummy_token_' + Date.now();
         localStorage.setItem('admin_token', token);
         setIsAuthenticated(true);

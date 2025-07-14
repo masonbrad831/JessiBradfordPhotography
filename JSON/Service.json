@@ -1,0 +1,19 @@
+{
+  "model": {
+    "id": "string",
+    "name": "string",
+    "description": "string",
+    "price": "string",
+    "duration": "string",
+    "includes": ["string"],
+    "category": "portrait | couple | family | engagement | wedding"
+  },
+  "dto": {
+    "name": "Portrait Session",
+    "description": "Individual or family portrait sessions in beautiful outdoor locations or studio.",
+    "price": "$150",
+    "duration": "1 hour",
+    "includes": ["1 hour photography session", "Professional editing of 20+ images"],
+    "category": "portrait"
+  }
+} 
