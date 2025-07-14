@@ -1,0 +1,28 @@
+{
+  "sectionDescription": "A glimpse into my artistic vision and the beautiful moments I've captured",
+  "items": [
+    {
+      "id": "1",
+      "title": "Sample Featured Photo",
+      "imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+      "category": "portrait",
+      "isActive": true
+    },
+    {
+      "id": "1752519385354",
+      "title": "Sample",
+      "imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+      "category": "family",
+      "order": 2,
+      "isActive": true
+    },
+    {
+      "id": "1752519406261",
+      "title": "Sample",
+      "imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+      "category": "engagement",
+      "order": 3,
+      "isActive": true
+    }
+  ]
+}

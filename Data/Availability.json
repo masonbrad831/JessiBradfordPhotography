@@ -1,0 +1,152 @@
+{
+  "2025-07-24": {
+    "date": "2025-07-24",
+    "isAvailable": true,
+    "timeSlots": [
+      {
+        "time": "2:00 PM",
+        "isAvailable": true
+      },
+      {
+        "time": "2:30 PM",
+        "isAvailable": true
+      }
+    ]
+  },
+  "2025-07-25": {
+    "date": "2025-07-25",
+    "isAvailable": true,
+    "timeSlots": [
+      {
+        "time": "5:00 PM",
+        "isAvailable": true
+      },
+      {
+        "time": "5:30 PM",
+        "isAvailable": true
+      },
+      {
+        "time": "6:00 PM",
+        "isAvailable": true
+      },
+      {
+        "time": "6:30 PM",
+        "isAvailable": true
+      },
+      {
+        "time": "7:00 PM",
+        "isAvailable": true
+      },
+      {
+        "time": "7:30 PM",
+        "isAvailable": true
+      },
+      {
+        "time": "8:00 PM",
+        "isAvailable": true
+      }
+    ]
+  },
+  "2025-07-26": {
+    "date": "2025-07-26",
+    "isAvailable": true,
+    "timeSlots": [
+      {
+        "time": "5:00 PM",
+        "isAvailable": true
+      },
+      {
+        "time": "5:30 PM",
+        "isAvailable": true
+      },
+      {
+        "time": "6:00 PM",
+        "isAvailable": true
+      },
+      {
+        "time": "6:30 PM",
+        "isAvailable": true
+      },
+      {
+        "time": "7:00 PM",
+        "isAvailable": true
+      },
+      {
+        "time": "7:30 PM",
+        "isAvailable": true
+      },
+      {
+        "time": "8:00 PM",
+        "isAvailable": true
+      }
+    ]
+  },
+  "2025-07-27": {
+    "date": "2025-07-27",
+    "isAvailable": true,
+    "timeSlots": [
+      {
+        "time": "5:00 PM",
+        "isAvailable": true
+      },
+      {
+        "time": "5:30 PM",
+        "isAvailable": true
+      },
+      {
+        "time": "6:00 PM",
+        "isAvailable": true
+      },
+      {
+        "time": "6:30 PM",
+        "isAvailable": true
+      },
+      {
+        "time": "7:00 PM",
+        "isAvailable": true
+      },
+      {
+        "time": "7:30 PM",
+        "isAvailable": true
+      },
+      {
+        "time": "8:00 PM",
+        "isAvailable": true
+      }
+    ]
+  },
+  "2025-07-20": {
+    "date": "2025-07-20",
+    "isAvailable": true,
+    "timeSlots": [
+      {
+        "time": "5:00 PM",
+        "isAvailable": true
+      },
+      {
+        "time": "5:30 PM",
+        "isAvailable": true
+      },
+      {
+        "time": "6:00 PM",
+        "isAvailable": true
+      },
+      {
+        "time": "6:30 PM",
+        "isAvailable": true
+      },
+      {
+        "time": "7:00 PM",
+        "isAvailable": true
+      },
+      {
+        "time": "7:30 PM",
+        "isAvailable": true
+      },
+      {
+        "time": "8:00 PM",
+        "isAvailable": true
+      }
+    ]
+  }
+}

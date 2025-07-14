@@ -1,35 +1,26 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Star, User } from 'lucide-react';
+import { fetchResource } from '../api';
 
 const Reviews: React.FC = () => {
-  // Placeholder reviews
-  const reviews = [
-    {
-      id: '1',
-      clientName: 'Sarah M.',
-      rating: 5,
-      comment: 'Jessi captured our engagement perfectly! The photos are stunning and truly reflect our personalities.',
-      date: '2024-01-20',
-      serviceType: 'Engagement Session',
-    },
-    {
-      id: '2',
-      clientName: 'The Johnson Family',
-      rating: 5,
-      comment: 'We loved our family session! Jessi made everyone feel comfortable and the results are beautiful.',
-      date: '2024-01-15',
-      serviceType: 'Family Session',
-    },
-    {
-      id: '3',
-      clientName: 'Emma D.',
-      rating: 4,
-      comment: 'Great experience! Jessi is so talented and the photos turned out amazing.',
-      date: '2024-01-10',
-      serviceType: 'Portrait Session',
-    },
-  ];
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadReviews() {
+      setLoading(true);
+      try {
+        const reviewsData = await fetchResource('Review');
+        setReviews(Array.isArray(reviewsData) ? reviewsData : []);
+      } catch (e) {
+        setReviews([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadReviews();
+  }, []);
 
   return (
     <div className="min-h-screen bg-cream-50">
@@ -66,42 +57,47 @@ const Reviews: React.FC = () => {
               Real experiences from wonderful clients who trusted me to capture their special moments
             </p>
           </motion.div>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-            {reviews.map((review, index) => (
-              <motion.div
-                key={review.id}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.2 }}
-                className="bg-cream-200 rounded-lg shadow-lg p-10 card-hover"
-              >
-                <div className="flex items-center space-x-6 mb-8">
-                  <div className="w-16 h-16 bg-sage-100 rounded-full flex items-center justify-center">
-                    <User className="w-8 h-8 text-sage-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-sage-800 mb-2">
-                      {review.clientName}
-                    </h3>
-                    <div className="flex items-center space-x-1">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`w-5 h-5 ${i < review.rating ? 'text-sage-600' : 'text-sage-300'}`}
-                          fill={i < review.rating ? 'currentColor' : 'none'}
-                        />
-                      ))}
+            {loading ? (
+              <div className="col-span-full text-center text-sage-600">Loading reviews...</div>
+            ) : reviews.length === 0 ? (
+              <div className="col-span-full text-center text-sage-600">No reviews found.</div>
+            ) : (
+              reviews.map((review, index) => (
+                <motion.div
+                  key={review.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: index * 0.2 }}
+                  className="bg-cream-200 rounded-lg shadow-lg p-10 card-hover"
+                >
+                  <div className="flex items-center space-x-6 mb-8">
+                    <div className="w-16 h-16 bg-sage-100 rounded-full flex items-center justify-center">
+                      <User className="w-8 h-8 text-sage-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold text-sage-800 mb-2">
+                        {review.clientName}
+                      </h3>
+                      <div className="flex items-center space-x-1">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`w-5 h-5 ${i < review.rating ? 'text-sage-600' : 'text-sage-300'}`}
+                            fill={i < review.rating ? 'currentColor' : 'none'}
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <p className="text-sage-700 mb-8 text-lg leading-relaxed">"{review.comment}"</p>
-                <div className="flex items-center justify-between text-sage-500 text-base pt-6 border-t border-sage-200">
-                  <span className="font-medium">{review.serviceType}</span>
-                  <span>{new Date(review.date).toLocaleDateString()}</span>
-                </div>
-              </motion.div>
-            ))}
+                  <p className="text-sage-700 mb-8 text-lg leading-relaxed">"{review.comment}"</p>
+                  <div className="flex items-center justify-between text-sage-500 text-base pt-6 border-t border-sage-200">
+                    <span className="font-medium">{review.serviceType}</span>
+                    <span>{new Date(review.date).toLocaleDateString()}</span>
+                  </div>
+                </motion.div>
+              ))
+            )}
           </div>
         </div>
       </section>

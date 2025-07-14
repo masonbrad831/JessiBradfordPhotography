@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, Clock, Plus, Trash2, Edit, X, Save, ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { fetchResource, saveResource } from '../api';
 
 interface TimeSlot {
   time: string;
@@ -52,6 +53,25 @@ const AvailabilityCalendar: React.FC = () => {
   const [showPresetModal, setShowPresetModal] = useState(false);
   const [newPreset, setNewPreset] = useState({ name: '', start: '18:00', end: '20:00', isAvailable: true });
   const [applyPresetId, setApplyPresetId] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadAvailability() {
+      setLoading(true);
+      try {
+        const availData = await fetchResource('Availability');
+        setAvailability(availData && typeof availData === 'object' ? availData : {});
+        const presetData = await fetchResource('AvailabilityPresets');
+        setPresets(Array.isArray(presetData) ? presetData : []);
+      } catch (e) {
+        setAvailability({});
+        setPresets([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadAvailability();
+  }, []);
 
   // Calendar helpers
   const getDaysInMonth = (date: Date) => {
@@ -109,10 +129,14 @@ const AvailabilityCalendar: React.FC = () => {
     setAvailability({ ...availability, [dateStr]: { ...current, timeSlots: newTimeSlots } });
     toast.success('Time slot removed');
   };
-  const handleSaveAvailability = () => {
-    // TODO: Send to API
-    console.log('Saving availability:', availability);
-    toast.success('Availability settings saved');
+  const handleSaveAvailability = async () => {
+    try {
+      await saveResource('Availability', availability);
+      await saveResource('AvailabilityPresets', presets);
+      toast.success('Availability settings saved');
+    } catch (e) {
+      toast.error('Failed to save availability');
+    }
   };
   const navigateMonth = (direction: 'prev' | 'next') => {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + (direction === 'next' ? 1 : -1), 1));
@@ -120,15 +144,17 @@ const AvailabilityCalendar: React.FC = () => {
   const selectedDayAvailability = selectedDate ? availability[selectedDate] || { date: selectedDate, isAvailable: false, timeSlots: [] } : null;
 
   // Preset logic
-  const handleCreatePreset = () => {
+  const handleCreatePreset = async () => {
     if (!newPreset.name || !newPreset.start || !newPreset.end) {
       toast.error('Please fill in all fields');
       return;
     }
     const times = generate30MinIntervals(newPreset.start, newPreset.end);
-    setPresets([...presets, { id: Date.now().toString(), name: newPreset.name, timeSlots: times, isAvailable: newPreset.isAvailable }]);
+    const updatedPresets = [...presets, { id: Date.now().toString(), name: newPreset.name, timeSlots: times, isAvailable: newPreset.isAvailable }];
+    setPresets(updatedPresets);
     setNewPreset({ name: '', start: '18:00', end: '20:00', isAvailable: true });
     setShowPresetModal(false);
+    await saveResource('AvailabilityPresets', updatedPresets);
     toast.success('Preset created');
   };
   const handleApplyPreset = () => {

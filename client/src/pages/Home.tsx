@@ -1,44 +1,64 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Camera, Heart, Star, MapPin } from 'lucide-react';
+import { ArrowRight, Camera, Heart, Star, MapPin, Users, Clock } from 'lucide-react';
+import { fetchResource } from '../api';
 
-const heroImages = [
-  '/images/hero1.jpg',
-  '/images/hero2.jpg',
-  '/images/hero3.jpg',
-];
+const ICON_MAP: Record<string, any> = {
+  Camera,
+  Heart,
+  Star,
+  Users,
+  Clock,
+};
 
 const Home: React.FC = () => {
+  const [heroImages, setHeroImages] = useState<string[]>([]);
   const [currentHero, setCurrentHero] = useState(0);
+  const [featuredPhotos, setFeaturedPhotos] = useState<any[]>([]);
+  const [featuredWorkDescription, setFeaturedWorkDescription] = useState<string>("");
+  const [homeIntro, setHomeIntro] = useState<any>(null);
+  const [services, setServices] = useState<any[]>([]);
 
   useEffect(() => {
+    async function loadSlideshowAndFeatured() {
+      try {
+        const slideshow = await fetchResource('SlideshowImage');
+        setHeroImages(Array.isArray(slideshow) ? slideshow.filter((img: any) => img.isActive !== false).map((img: any) => img.imageUrl) : []);
+        const featured = await fetchResource('FeaturedWork');
+        if (featured && typeof featured === 'object' && Array.isArray(featured.items)) {
+          setFeaturedPhotos(featured.items.filter((f: any) => f.isActive !== false));
+          setFeaturedWorkDescription(featured.sectionDescription || "");
+        } else if (Array.isArray(featured)) {
+          setFeaturedPhotos(featured.filter((f: any) => f.isActive !== false));
+          setFeaturedWorkDescription("");
+        } else {
+          setFeaturedPhotos([]);
+          setFeaturedWorkDescription("");
+        }
+        const intro = await fetchResource('HomeIntro');
+        setHomeIntro(intro);
+        // Fetch session types for services section
+        const sessionTypes = await fetchResource('SessionTypes');
+        setServices(Array.isArray(sessionTypes) ? sessionTypes : []);
+      } catch (e) {
+        setHeroImages([]);
+        setFeaturedPhotos([]);
+        setFeaturedWorkDescription("");
+        setHomeIntro(null);
+        setServices([]);
+      }
+    }
+    loadSlideshowAndFeatured();
+  }, []);
+
+  useEffect(() => {
+    if (heroImages.length === 0) return;
     const interval = setInterval(() => {
       setCurrentHero((prev) => (prev + 1) % heroImages.length);
     }, 8000);
     return () => clearInterval(interval);
-  }, []);
-
-  const featuredPhotos = [
-    {
-      id: '1',
-      title: 'Family Portrait',
-      imageUrl: '/api/placeholder/600/400',
-      category: 'family'
-    },
-    {
-      id: '2',
-      title: 'Couple Session',
-      imageUrl: '/api/placeholder/600/400',
-      category: 'couple'
-    },
-    {
-      id: '3',
-      title: 'Individual Portrait',
-      imageUrl: '/api/placeholder/600/400',
-      category: 'portrait'
-    }
-  ];
+  }, [heroImages]);
 
   return (
     <div className="min-h-screen">
@@ -49,24 +69,26 @@ const Home: React.FC = () => {
           <div
             className="absolute left-0 top-0 w-1/2 h-full bg-cover bg-center filter blur-xl brightness-75"
             style={{
-              backgroundImage: `url('${heroImages[currentHero]}')`,
+              backgroundImage: heroImages.length > 0 ? `url('${heroImages[currentHero]}')` : undefined,
             }}
           ></div>
           <div
             className="absolute right-0 top-0 w-1/2 h-full bg-cover bg-center filter blur-xl brightness-75"
             style={{
-              backgroundImage: `url('${heroImages[currentHero]}')`,
+              backgroundImage: heroImages.length > 0 ? `url('${heroImages[currentHero]}')` : undefined,
             }}
           ></div>
         </div>
         {/* Centered main image */}
         <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-          <img
-            src={heroImages[currentHero]}
-            alt="Slideshow hero"
-            className="max-w-3xl w-full h-auto rounded-lg shadow-xl object-contain"
-            style={{ maxHeight: '80vh' }}
-          />
+          {heroImages.length > 0 && (
+            <img
+              src={heroImages[currentHero]}
+              alt="Slideshow hero"
+              className="max-w-3xl w-full h-auto rounded-lg shadow-xl object-contain"
+              style={{ maxHeight: '80vh' }}
+            />
+          )}
         </div>
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-wood-900/80 to-farmhouse-900/80 z-20"></div>
@@ -110,21 +132,19 @@ const Home: React.FC = () => {
               viewport={{ once: true }}
             >
               <h2 className="text-4xl font-vintage font-semibold text-wood-800 mb-6">
-                Based in Salina, Utah
+                {homeIntro?.heading || "Based in Salina, Utah"}
               </h2>
               <p className="text-lg text-wood-700 mb-6">
-                I specialize in capturing authentic moments through portrait, couple, and family photography. 
-                My warm, rustic style brings out the natural beauty and emotion in every session.
+                {homeIntro?.description || "I specialize in capturing authentic moments through portrait, couple, and family photography. My warm, rustic style brings out the natural beauty and emotion in every session."}
               </p>
               <div className="flex items-center space-x-4 mb-6">
                 <MapPin className="w-6 h-6 text-wood-600" />
-                <span className="text-wood-700">Serving Sevier County</span>
+                <span className="text-wood-700">{homeIntro?.location || "Serving Sevier County"}</span>
               </div>
-              <Link to="/about" className="btn-primary">
-                Learn More About Me
+              <Link className="btn-primary" to={homeIntro?.buttonLink || "/about"}>
+                {homeIntro?.buttonText || "Learn More About Me"}
               </Link>
             </motion.div>
-            
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -134,7 +154,7 @@ const Home: React.FC = () => {
             >
               <div className="aspect-square bg-wood-200 rounded-lg overflow-hidden rustic-border">
                 <img
-                  src="/api/placeholder/600/600"
+                  src={homeIntro?.imageUrl || "/api/placeholder/600/600"}
                   alt="Jessi Bradford"
                   className="w-full h-full object-cover"
                 />
@@ -158,12 +178,14 @@ const Home: React.FC = () => {
               Featured Work
             </h2>
             <p className="text-lg text-wood-600 max-w-2xl mx-auto">
-              A glimpse into my artistic vision and the beautiful moments I've captured
+              {featuredWorkDescription || "A glimpse into my artistic vision and the beautiful moments I've captured"}
             </p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {featuredPhotos.map((photo, index) => (
+            {featuredPhotos.length === 0 ? (
+              <div className="col-span-full text-center text-wood-600">No featured work yet.</div>
+            ) : featuredPhotos.map((photo, index) => (
               <motion.div
                 key={photo.id}
                 initial={{ opacity: 0, y: 30 }}
@@ -216,30 +238,31 @@ const Home: React.FC = () => {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { icon: Heart, title: 'Couples', description: 'Romantic sessions for couples in love' },
-              { icon: Camera, title: 'Portraits', description: 'Individual and family portrait sessions' },
-              { icon: Star, title: 'Special Events', description: 'Engagements, anniversaries, and more' }
-            ].map((service, index) => (
-              <motion.div
-                key={service.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.2 }}
-                viewport={{ once: true }}
-                className="farmhouse-card text-center card-hover"
-              >
-                <div className="w-16 h-16 bg-wood-200 rounded-full flex items-center justify-center mx-auto mb-6 border border-wood-300">
-                  <service.icon className="w-8 h-8 text-wood-700" />
-                </div>
-                <h3 className="text-xl font-semibold text-wood-800 mb-4">
-                  {service.title}
-                </h3>
-                <p className="text-wood-600">
-                  {service.description}
-                </p>
-              </motion.div>
-            ))}
+            {services.length === 0 ? (
+              <div className="col-span-full text-center text-wood-600">No services available.</div>
+            ) : services.map((service: any, index: number) => {
+              const Icon = ICON_MAP[service.icon] || Camera;
+              return (
+                <motion.div
+                  key={service.id || service.name}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: index * 0.2 }}
+                  viewport={{ once: true }}
+                  className="farmhouse-card text-center card-hover"
+                >
+                  <div className="w-16 h-16 bg-wood-200 rounded-full flex items-center justify-center mx-auto mb-6 border border-wood-300">
+                    <Icon className="w-8 h-8 text-wood-700" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-wood-800 mb-4">
+                    {service.name}
+                  </h3>
+                  <p className="text-wood-600">
+                    {service.description}
+                  </p>
+                </motion.div>
+              );
+            })}
           </div>
 
           <div className="text-center mt-12">

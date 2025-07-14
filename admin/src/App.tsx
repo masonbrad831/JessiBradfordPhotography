@@ -12,6 +12,11 @@ import SlideshowManager from './pages/SlideshowManager';
 import FeaturedWorkManager from './pages/FeaturedWorkManager';
 import ReviewsManager from './pages/ReviewsManager';
 import AvailabilityCalendar from './pages/AvailabilityCalendar';
+import SessionTypeManager from './pages/SessionTypeManager';
+import AboutMeManager from './pages/AboutMeManager';
+import PromotionsManager from './pages/PromotionsManager';
+import HomeIntroManager from './pages/HomeIntroManager';
+import AdditionalServicesManager from './pages/AdditionalServicesManager';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -40,6 +45,11 @@ function App() {
               <Route path="featured-work" element={<FeaturedWorkManager />} />
               <Route path="reviews" element={<ReviewsManager />} />
               <Route path="availability" element={<AvailabilityCalendar />} />
+              <Route path="session-types" element={<SessionTypeManager />} />
+              <Route path="additional-services" element={<AdditionalServicesManager />} />
+              <Route path="about-me" element={<AboutMeManager />} />
+              <Route path="home-intro" element={<HomeIntroManager />} />
+              <Route path="promotions" element={<PromotionsManager />} />
               <Route path="settings" element={<Settings />} />
             </Route>
           </Routes>

@@ -1,73 +1,83 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, Plus, Trash2, Edit, Eye, Upload, X } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { fetchResource, saveResource } from '../api';
 
 const SlideshowManager: React.FC = () => {
-  const [slideshowImages, setSlideshowImages] = useState([
-    {
-      id: '1',
-      title: 'Hero Image 1',
-      imageUrl: `${process.env.REACT_APP_CLIENT_URL || ''}/images/hero1.jpg`,
-      order: 1,
-      isActive: true
-    },
-    {
-      id: '2',
-      title: 'Hero Image 2',
-      imageUrl: `${process.env.REACT_APP_CLIENT_URL || ''}/images/hero2.jpg`,
-      order: 2,
-      isActive: true
-    },
-    {
-      id: '3',
-      title: 'Hero Image 3',
-      imageUrl: `${process.env.REACT_APP_CLIENT_URL || ''}/images/hero3.jpg`,
-      order: 3,
-      isActive: true
-    }
-  ]);
-
+  const [slideshowImages, setSlideshowImages] = useState<any[]>([]);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [newImage, setNewImage] = useState({
     title: '',
     imageUrl: '',
-    order: slideshowImages.length + 1
+    order: 1
   });
+  const [loading, setLoading] = useState(true);
 
-  const handleAddImage = () => {
+  useEffect(() => {
+    async function loadImages() {
+      setLoading(true);
+      try {
+        const images = await fetchResource('SlideshowImage');
+        setSlideshowImages(Array.isArray(images) ? images : []);
+      } catch (e) {
+        setSlideshowImages([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadImages();
+  }, []);
+
+  const handleAddImage = async () => {
     if (!newImage.title || !newImage.imageUrl) {
       toast.error('Please fill in all fields');
       return;
     }
-
-    const newSlide = {
-      id: Date.now().toString(),
-      ...newImage,
-      isActive: true
-    };
-
-    setSlideshowImages([...slideshowImages, newSlide]);
-    setNewImage({ title: '', imageUrl: '', order: slideshowImages.length + 2 });
-    setShowUploadModal(false);
-    toast.success('Image added to slideshow');
+    try {
+      const newSlide = {
+        id: Date.now().toString(),
+        ...newImage,
+        isActive: true,
+        order: slideshowImages.length + 1
+      };
+      const updatedImages = [...slideshowImages, newSlide];
+      await saveResource('SlideshowImage', updatedImages);
+      setSlideshowImages(updatedImages);
+      setNewImage({ title: '', imageUrl: '', order: updatedImages.length + 1 });
+      setShowUploadModal(false);
+      toast.success('Image added to slideshow');
+    } catch (e) {
+      toast.error('Failed to add image');
+    }
   };
 
-  const handleDeleteImage = (id: string) => {
-    setSlideshowImages(slideshowImages.filter(img => img.id !== id));
-    toast.success('Image removed from slideshow');
+  const handleDeleteImage = async (id: string) => {
+    try {
+      const updatedImages = slideshowImages.filter(img => img.id !== id);
+      await saveResource('SlideshowImage', updatedImages);
+      setSlideshowImages(updatedImages);
+      toast.success('Image removed from slideshow');
+    } catch (e) {
+      toast.error('Failed to remove image');
+    }
   };
 
-  const handleToggleActive = (id: string) => {
-    setSlideshowImages(slideshowImages.map(img => 
-      img.id === id ? { ...img, isActive: !img.isActive } : img
-    ));
+  const handleToggleActive = async (id: string) => {
+    try {
+      const updatedImages = slideshowImages.map(img =>
+        img.id === id ? { ...img, isActive: !img.isActive } : img
+      );
+      await saveResource('SlideshowImage', updatedImages);
+      setSlideshowImages(updatedImages);
+    } catch (e) {
+      toast.error('Failed to update status');
+    }
   };
 
-  const handleReorder = (id: string, direction: 'up' | 'down') => {
+  const handleReorder = async (id: string, direction: 'up' | 'down') => {
     const currentIndex = slideshowImages.findIndex(img => img.id === id);
     if (currentIndex === -1) return;
-
     const newImages = [...slideshowImages];
     if (direction === 'up' && currentIndex > 0) {
       [newImages[currentIndex], newImages[currentIndex - 1]] = 
@@ -76,8 +86,14 @@ const SlideshowManager: React.FC = () => {
       [newImages[currentIndex], newImages[currentIndex + 1]] = 
       [newImages[currentIndex + 1], newImages[currentIndex]];
     }
-
-    setSlideshowImages(newImages);
+    // Update order property
+    newImages.forEach((img, idx) => img.order = idx + 1);
+    try {
+      await saveResource('SlideshowImage', newImages);
+      setSlideshowImages(newImages);
+    } catch (e) {
+      toast.error('Failed to reorder');
+    }
   };
 
   return (

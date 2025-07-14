@@ -1,39 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Lock, Eye, Download, Heart } from 'lucide-react';
+import { fetchResource } from '../api';
 
 const ClientGallery: React.FC = () => {
   const [password, setPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [selectedPhotos, setSelectedPhotos] = useState<string[]>([]);
+  const [clientGalleries, setClientGalleries] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Placeholder client galleries
-  const clientGalleries = [
-    {
-      id: '1',
-      clientName: 'Sarah & Mike',
-      sessionDate: '2024-01-15',
-      category: 'Engagement',
-      coverImage: '/api/placeholder/400/300',
-      photoCount: 25
-    },
-    {
-      id: '2',
-      clientName: 'Johnson Family',
-      sessionDate: '2024-01-10',
-      category: 'Family',
-      coverImage: '/api/placeholder/400/300',
-      photoCount: 30
-    },
-    {
-      id: '3',
-      clientName: 'Emma & David',
-      sessionDate: '2024-01-05',
-      category: 'Couple',
-      coverImage: '/api/placeholder/400/300',
-      photoCount: 20
+  useEffect(() => {
+    async function loadGalleries() {
+      setLoading(true);
+      try {
+        const galleriesData = await fetchResource('ClientGallery');
+        setClientGalleries(Array.isArray(galleriesData) ? galleriesData : []);
+      } catch (e) {
+        setClientGalleries([]);
+      } finally {
+        setLoading(false);
+      }
     }
-  ];
+    loadGalleries();
+  }, []);
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -131,7 +121,11 @@ const ClientGallery: React.FC = () => {
       <section className="section-padding bg-cream-100">
         <div className="container-custom">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {clientGalleries.map((gallery, index) => (
+            {loading ? (
+              <div className="col-span-full text-center text-sage-600">Loading galleries...</div>
+            ) : clientGalleries.length === 0 ? (
+              <div className="col-span-full text-center text-sage-600">No galleries found.</div>
+            ) : clientGalleries.map((gallery, index) => (
               <motion.div
                 key={gallery.id}
                 initial={{ opacity: 0, y: 30 }}

@@ -1,0 +1,21 @@
+{
+  "heading": "My Photography Philosophy",
+  "description": "I believe that the best photographs are those that capture genuine emotion and tell a story. My moody, artistic approach emphasizes natural beauty and authentic moments.",
+  "cards": [
+    {
+      "icon": "Heart",
+      "title": "Authentic Moments",
+      "description": "I focus on capturing real emotions and genuine interactions rather than posed perfection."
+    },
+    {
+      "icon": "Camera",
+      "title": "Artistic Vision",
+      "description": "My moody, artistic style creates images that are both beautiful and emotionally compelling."
+    },
+    {
+      "icon": "Star",
+      "title": "Quality & Care",
+      "description": "Every image is carefully crafted and edited to ensure the highest quality for my clients."
+    }
+  ]
+}

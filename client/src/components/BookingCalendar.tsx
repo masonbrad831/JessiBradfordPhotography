@@ -1,32 +1,59 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Calendar, Clock, Check } from 'lucide-react';
+import { fetchResource } from '../api';
 
 interface BookingCalendarProps {
   onDateSelect: (date: Date, timeSlot: string) => void;
   selectedDate?: Date;
   selectedTime?: string;
+  fullyBookedDates?: string[];
 }
 
 const BookingCalendar: React.FC<BookingCalendarProps> = ({
   onDateSelect,
   selectedDate,
-  selectedTime
+  selectedTime,
+  fullyBookedDates = []
 }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDateState, setSelectedDateState] = useState<Date | undefined>(selectedDate);
   const [selectedTimeState, setSelectedTimeState] = useState<string | undefined>(selectedTime);
+  const [availability, setAvailability] = useState<any>({});
+  const [loading, setLoading] = useState(true);
 
-  // For testing, make all future dates available
+  useEffect(() => {
+    async function loadAvailability() {
+      setLoading(true);
+      try {
+        const availData = await fetchResource('Availability');
+        setAvailability(availData && typeof availData === 'object' ? availData : {});
+      } catch (e) {
+        setAvailability({});
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadAvailability();
+  }, [currentMonth]);
+
   const isDateAvailable = (date: Date) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    return date >= today;
+    const dateStr = date.toISOString().split('T')[0];
+    if (fullyBookedDates.includes(dateStr)) return false;
+    return date >= today && availability[dateStr] && availability[dateStr].isAvailable;
   };
 
-  const timeSlots = [
-    '9:00 AM', '10:00 AM', '11:00 AM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM'
-  ];
+  const getAvailableTimeSlots = (date: Date) => {
+    const dateStr = date.toISOString().split('T')[0];
+    if (availability[dateStr] && Array.isArray(availability[dateStr].timeSlots)) {
+      return availability[dateStr].timeSlots.filter((slot: any) => slot.isAvailable).map((slot: any) => slot.time);
+    }
+    return [];
+  };
+
+  const timeSlots = getAvailableTimeSlots(selectedDateState || new Date());
 
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
@@ -165,7 +192,7 @@ const BookingCalendar: React.FC<BookingCalendarProps> = ({
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {timeSlots.map((time) => (
+            {timeSlots.map((time: string) => (
               <button
                 key={time}
                 onClick={() => handleTimeSelect(time)}

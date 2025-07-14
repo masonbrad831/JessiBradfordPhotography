@@ -1,0 +1,26 @@
+[
+  {
+    "id": "1752509490601",
+    "code": "testtest",
+    "description": "test",
+    "usageLimit": 1,
+    "allowedSessionTypes": [
+      "test"
+    ],
+    "usedBy": [
+      "masonbrad831@gmail.com"
+    ]
+  },
+  {
+    "id": "1752518774467",
+    "code": "Portrait",
+    "description": "test",
+    "usageLimit": 1,
+    "allowedSessionTypes": [
+      "Portrait Session"
+    ],
+    "usedBy": [
+      "masonbrad831@gmail.com"
+    ]
+  }
+]

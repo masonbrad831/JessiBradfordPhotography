@@ -1,45 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, Plus, Trash2, Edit, Eye, X, Copy } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { fetchResource, saveResource } from '../api';
 
 const ReviewsManager: React.FC = () => {
-  const [reviews, setReviews] = useState([
-    {
-      id: '1',
-      clientName: 'Sarah M.',
-      rating: 5,
-      comment: 'Jessi captured our engagement perfectly! The photos are stunning and truly reflect our personalities.',
-      date: '2024-01-20',
-      serviceType: 'Engagement Session',
-      isActive: true,
-      isFeatured: true,
-      order: 1
-    },
-    {
-      id: '2',
-      clientName: 'The Johnson Family',
-      rating: 5,
-      comment: 'We loved our family session! Jessi made everyone feel comfortable and the results are beautiful.',
-      date: '2024-01-15',
-      serviceType: 'Family Session',
-      isActive: true,
-      isFeatured: true,
-      order: 2
-    },
-    {
-      id: '3',
-      clientName: 'Emma D.',
-      rating: 4,
-      comment: 'Great experience! Jessi is so talented and the photos turned out amazing.',
-      date: '2024-01-10',
-      serviceType: 'Portrait Session',
-      isActive: true,
-      isFeatured: false,
-      order: 3
-    }
-  ]);
-
+  const [reviews, setReviews] = useState<any[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingReview, setEditingReview] = useState<any>(null);
   const [newReview, setNewReview] = useState({
@@ -50,8 +16,24 @@ const ReviewsManager: React.FC = () => {
     date: new Date().toISOString().split('T')[0],
     isActive: true,
     isFeatured: false,
-    order: reviews.length + 1
+    order: 1
   });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadReviews() {
+      setLoading(true);
+      try {
+        const reviewsData = await fetchResource('Review');
+        setReviews(Array.isArray(reviewsData) ? reviewsData : []);
+      } catch (e) {
+        setReviews([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadReviews();
+  }, []);
 
   const serviceTypes = [
     'Family Session',
@@ -62,48 +44,64 @@ const ReviewsManager: React.FC = () => {
     'Event Photography'
   ];
 
-  const handleAddReview = () => {
+  const handleAddReview = async () => {
     if (!newReview.clientName || !newReview.comment || !newReview.serviceType) {
       toast.error('Please fill in all required fields');
       return;
     }
-
-    const review = {
-      id: Date.now().toString(),
-      ...newReview
-    };
-
-    setReviews([...reviews, review]);
-    setNewReview({
-      clientName: '',
-      rating: 5,
-      comment: '',
-      serviceType: '',
-      date: new Date().toISOString().split('T')[0],
-      isActive: true,
-      isFeatured: false,
-      order: reviews.length + 2
-    });
-    setShowAddModal(false);
-    toast.success('Review added');
+    try {
+      const review = {
+        id: Date.now().toString(),
+        ...newReview,
+        order: reviews.length + 1
+      };
+      const updatedReviews = [...reviews, review];
+      await saveResource('Review', updatedReviews);
+      setReviews(updatedReviews);
+      setNewReview({
+        clientName: '',
+        rating: 5,
+        comment: '',
+        serviceType: '',
+        date: new Date().toISOString().split('T')[0],
+        isActive: true,
+        isFeatured: false,
+        order: updatedReviews.length + 1
+      });
+      setShowAddModal(false);
+      toast.success('Review added');
+    } catch (e) {
+      toast.error('Failed to add review');
+    }
   };
 
-  const handleEditReview = () => {
+  const handleEditReview = async () => {
     if (!editingReview.clientName || !editingReview.comment || !editingReview.serviceType) {
       toast.error('Please fill in all required fields');
       return;
     }
-
-    setReviews(reviews.map(review => 
-      review.id === editingReview.id ? editingReview : review
-    ));
-    setEditingReview(null);
-    toast.success('Review updated');
+    try {
+      const updatedReviews = reviews.map(review =>
+        review.id === editingReview.id ? editingReview : review
+      );
+      await saveResource('Review', updatedReviews);
+      setReviews(updatedReviews);
+      setEditingReview(null);
+      toast.success('Review updated');
+    } catch (e) {
+      toast.error('Failed to update review');
+    }
   };
 
-  const handleDeleteReview = (id: string) => {
-    setReviews(reviews.filter(review => review.id !== id));
-    toast.success('Review removed');
+  const handleDeleteReview = async (id: string) => {
+    try {
+      const updatedReviews = reviews.filter(review => review.id !== id);
+      await saveResource('Review', updatedReviews);
+      setReviews(updatedReviews);
+      toast.success('Review removed');
+    } catch (e) {
+      toast.error('Failed to remove review');
+    }
   };
 
   const handleToggleActive = (id: string) => {
@@ -163,127 +161,133 @@ const ReviewsManager: React.FC = () => {
           <h2 className="text-lg font-semibold text-gray-900">Client Reviews</h2>
         </div>
         <div className="divide-y divide-gray-200">
-          {reviews.map((review, index) => (
-            <motion.div
-              key={review.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="p-6 hover:bg-gray-50 transition-colors"
-            >
-              <div className="flex items-start space-x-4">
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-lg font-semibold text-gray-900">{review.clientName}</h3>
-                    <div className="flex items-center space-x-2">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        review.isFeatured 
-                          ? 'bg-purple-100 text-purple-800' 
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {review.isFeatured ? 'Featured' : 'Regular'}
-                      </span>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        review.isActive 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {review.isActive ? 'Active' : 'Inactive'}
-                      </span>
+          {loading ? (
+            <div className="p-6 text-center text-gray-500">Loading reviews...</div>
+          ) : reviews.length === 0 ? (
+            <div className="p-6 text-center text-gray-500">No reviews found. Add one!</div>
+          ) : (
+            reviews.map((review, index) => (
+              <motion.div
+                key={review.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="p-6 hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-start space-x-4">
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-lg font-semibold text-gray-900">{review.clientName}</h3>
+                      <div className="flex items-center space-x-2">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          review.isFeatured 
+                            ? 'bg-purple-100 text-purple-800' 
+                            : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {review.isFeatured ? 'Featured' : 'Regular'}
+                        </span>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          review.isActive 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {review.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2 mb-2">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`w-4 h-4 ${i < review.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                          fill={i < review.rating ? 'currentColor' : 'none'}
+                        />
+                      ))}
+                      <span className="text-sm text-gray-600">({review.rating}/5)</span>
+                    </div>
+                    
+                    <p className="text-gray-700 mb-3 italic">"{review.comment}"</p>
+                    
+                    <div className="flex items-center justify-between text-sm text-gray-500">
+                      <span>{review.serviceType}</span>
+                      <span>{new Date(review.date).toLocaleDateString()}</span>
                     </div>
                   </div>
                   
-                  <div className="flex items-center space-x-2 mb-2">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`w-4 h-4 ${i < review.rating ? 'text-yellow-400' : 'text-gray-300'}`}
-                        fill={i < review.rating ? 'currentColor' : 'none'}
-                      />
-                    ))}
-                    <span className="text-sm text-gray-600">({review.rating}/5)</span>
-                  </div>
-                  
-                  <p className="text-gray-700 mb-3 italic">"{review.comment}"</p>
-                  
-                  <div className="flex items-center justify-between text-sm text-gray-500">
-                    <span>{review.serviceType}</span>
-                    <span>{new Date(review.date).toLocaleDateString()}</span>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => handleToggleFeatured(review.id)}
+                      className={`p-2 rounded-lg transition-colors ${
+                        review.isFeatured 
+                          ? 'text-purple-600 hover:bg-purple-100' 
+                          : 'text-gray-400 hover:text-purple-600 hover:bg-purple-50'
+                      }`}
+                      title={review.isFeatured ? 'Remove from featured' : 'Mark as featured'}
+                    >
+                      <Star className="w-4 h-4" />
+                    </button>
+                    
+                    <button
+                      onClick={() => handleToggleActive(review.id)}
+                      className={`p-2 rounded-lg transition-colors ${
+                        review.isActive 
+                          ? 'text-green-600 hover:bg-green-100' 
+                          : 'text-red-600 hover:bg-red-100'
+                      }`}
+                      title={review.isActive ? 'Deactivate' : 'Activate'}
+                    >
+                      <Eye className="w-4 h-4" />
+                    </button>
+                    
+                    <button
+                      onClick={() => handleCopyReview(review)}
+                      className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                      title="Copy review text"
+                    >
+                      <Copy className="w-4 h-4" />
+                    </button>
+                    
+                    <button
+                      onClick={() => setEditingReview(review)}
+                      className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                      title="Edit review"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    
+                    <button
+                      onClick={() => handleDeleteReview(review.id)}
+                      className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50"
+                      title="Delete review"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
                 
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => handleToggleFeatured(review.id)}
-                    className={`p-2 rounded-lg transition-colors ${
-                      review.isFeatured 
-                        ? 'text-purple-600 hover:bg-purple-100' 
-                        : 'text-gray-400 hover:text-purple-600 hover:bg-purple-50'
-                    }`}
-                    title={review.isFeatured ? 'Remove from featured' : 'Mark as featured'}
-                  >
-                    <Star className="w-4 h-4" />
-                  </button>
-                  
-                  <button
-                    onClick={() => handleToggleActive(review.id)}
-                    className={`p-2 rounded-lg transition-colors ${
-                      review.isActive 
-                        ? 'text-green-600 hover:bg-green-100' 
-                        : 'text-red-600 hover:bg-red-100'
-                    }`}
-                    title={review.isActive ? 'Deactivate' : 'Activate'}
-                  >
-                    <Eye className="w-4 h-4" />
-                  </button>
-                  
-                  <button
-                    onClick={() => handleCopyReview(review)}
-                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100"
-                    title="Copy review text"
-                  >
-                    <Copy className="w-4 h-4" />
-                  </button>
-                  
-                  <button
-                    onClick={() => setEditingReview(review)}
-                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100"
-                    title="Edit review"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </button>
-                  
-                  <button
-                    onClick={() => handleDeleteReview(review.id)}
-                    className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50"
-                    title="Delete review"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+                  <span className="text-xs text-gray-500">Order: {review.order}</span>
+                  <div className="flex space-x-1">
+                    <button
+                      onClick={() => handleReorder(review.id, 'up')}
+                      disabled={index === 0}
+                      className="text-xs text-gray-400 hover:text-gray-600 disabled:opacity-50"
+                    >
+                      ↑
+                    </button>
+                    <button
+                      onClick={() => handleReorder(review.id, 'down')}
+                      disabled={index === reviews.length - 1}
+                      className="text-xs text-gray-400 hover:text-gray-600 disabled:opacity-50"
+                    >
+                      ↓
+                    </button>
+                  </div>
                 </div>
-              </div>
-              
-              <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
-                <span className="text-xs text-gray-500">Order: {review.order}</span>
-                <div className="flex space-x-1">
-                  <button
-                    onClick={() => handleReorder(review.id, 'up')}
-                    disabled={index === 0}
-                    className="text-xs text-gray-400 hover:text-gray-600 disabled:opacity-50"
-                  >
-                    ↑
-                  </button>
-                  <button
-                    onClick={() => handleReorder(review.id, 'down')}
-                    disabled={index === reviews.length - 1}
-                    className="text-xs text-gray-400 hover:text-gray-600 disabled:opacity-50"
-                  >
-                    ↓
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))
+          )}
         </div>
       </div>
 

@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Filter, Download, Heart } from 'lucide-react';
+import { fetchResource } from '../api';
 
 const Portfolio: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedPhotos, setSelectedPhotos] = useState<string[]>([]);
+  const [photos, setPhotos] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const categories = [
     { id: 'all', name: 'All' },
@@ -15,18 +18,20 @@ const Portfolio: React.FC = () => {
     { id: 'wedding', name: 'Wedding' }
   ];
 
-  // Placeholder data - replace with actual photos
-  const photos = [
-    { id: '1', title: 'Family Portrait', category: 'family', imageUrl: '/api/placeholder/600/800' },
-    { id: '2', title: 'Couple Session', category: 'couple', imageUrl: '/api/placeholder/600/800' },
-    { id: '3', title: 'Individual Portrait', category: 'portrait', imageUrl: '/api/placeholder/600/800' },
-    { id: '4', title: 'Engagement Session', category: 'engagement', imageUrl: '/api/placeholder/600/800' },
-    { id: '5', title: 'Wedding Ceremony', category: 'wedding', imageUrl: '/api/placeholder/600/800' },
-    { id: '6', title: 'Family Outdoors', category: 'family', imageUrl: '/api/placeholder/600/800' },
-    { id: '7', title: 'Couple Portrait', category: 'couple', imageUrl: '/api/placeholder/600/800' },
-    { id: '8', title: 'Senior Portrait', category: 'portrait', imageUrl: '/api/placeholder/600/800' },
-    { id: '9', title: 'Wedding Reception', category: 'wedding', imageUrl: '/api/placeholder/600/800' }
-  ];
+  useEffect(() => {
+    async function loadPhotos() {
+      setLoading(true);
+      try {
+        const featuredWork = await fetchResource('FeaturedWork');
+        setPhotos(Array.isArray(featuredWork) ? featuredWork : []);
+      } catch (e) {
+        setPhotos([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadPhotos();
+  }, []);
 
   const filteredPhotos = selectedCategory === 'all' 
     ? photos 
@@ -79,7 +84,11 @@ const Portfolio: React.FC = () => {
 
           {/* Photo Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredPhotos.map((photo, index) => (
+            {loading ? (
+              <div className="col-span-full text-center text-sage-600">Loading photos...</div>
+            ) : filteredPhotos.length === 0 ? (
+              <div className="col-span-full text-center text-sage-600">No photos found.</div>
+            ) : filteredPhotos.map((photo, index) => (
               <motion.div
                 key={photo.id}
                 initial={{ opacity: 0, y: 30 }}
@@ -93,7 +102,6 @@ const Portfolio: React.FC = () => {
                     alt={photo.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  
                   {/* Overlay */}
                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                     <div className="flex space-x-4">
@@ -113,7 +121,6 @@ const Portfolio: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                
                 <div className="p-6">
                   <h3 className="text-lg font-semibold text-sage-800 mb-2">
                     {photo.title}

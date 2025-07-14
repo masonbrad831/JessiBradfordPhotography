@@ -63,4 +63,13 @@ export interface ClientGallery {
   category: string;
   photos: Photo[];
   password?: string;
+}
+
+export interface Promotion {
+  id: string;
+  code: string;
+  description: string;
+  usageLimit: number;
+  usedBy: string[]; // emails that have used this promotion
+  allowedSessionTypes: string[];
 } 

@@ -12,7 +12,8 @@ import {
   Camera,
   Star,
   Clock,
-  Globe
+  Globe,
+  Gift
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import toast from 'react-hot-toast';
@@ -28,11 +29,16 @@ const AdminLayout: React.FC = () => {
     { name: 'Portfolio', href: '/portfolio', icon: Image },
     { name: 'Bookings', href: '/bookings', icon: Calendar },
     { name: 'Client Galleries', href: '/client-galleries', icon: Users },
+    { name: 'Session Types', href: '/session-types', icon: Clock },
+    { name: 'About Me', href: '/about-me', icon: Users },
+    { name: 'Additional Services', href: '/additional-services', icon: Gift },
+    { name: 'Promotions', href: '/promotions', icon: Gift },
     { name: 'Website Content', href: '#', icon: Globe, children: [
       { name: 'Slideshow', href: '/slideshow', icon: Camera },
       { name: 'Featured Work', href: '/featured-work', icon: Image },
       { name: 'Reviews', href: '/reviews', icon: Star },
       { name: 'Availability', href: '/availability', icon: Clock },
+      { name: 'Home Intro', href: '/home-intro', icon: Globe }
     ]},
     { name: 'Settings', href: '/settings', icon: Settings },
   ];

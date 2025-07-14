@@ -1,8 +1,94 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Camera, Heart, MapPin, Award } from 'lucide-react';
+import { Camera, Heart, MapPin, Award, Save, Star } from 'lucide-react';
+import { fetchResource } from '../api';
+
+const ICON_MAP: Record<string, any> = {
+  Heart,
+  Camera,
+  Star,
+};
+
+const LOCATION_ICON_MAP: Record<string, any> = {
+  MapPin,
+  Camera,
+  Heart,
+};
 
 const About: React.FC = () => {
+  const [aboutMe, setAboutMe] = useState('');
+  const [aboutMeImage, setAboutMeImage] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [homeIntro, setHomeIntro] = useState<any>(null);
+  const [introLoading, setIntroLoading] = useState(true);
+  const [philosophy, setPhilosophy] = useState<any>(null);
+  const [philosophyLoading, setPhilosophyLoading] = useState(true);
+  const [locationImageUrl, setLocationImageUrl] = useState('');
+  const [locationHeading, setLocationHeading] = useState('');
+  const [locationParagraph, setLocationParagraph] = useState('');
+  const [locationFeatures, setLocationFeatures] = useState<any[]>([]);
+  const [locationLoading, setLocationLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadAboutMe() {
+      setLoading(true);
+      setLocationLoading(true);
+      try {
+        const data = await fetchResource('AboutMe');
+        if (typeof data === 'object' && data !== null) {
+          setAboutMe(data.content || '');
+          setAboutMeImage(data.imageUrl || '');
+          setLocationImageUrl(data.locationImageUrl || '');
+          setLocationHeading(data.locationHeading || '');
+          setLocationParagraph(data.locationParagraph || '');
+          setLocationFeatures(data.locationFeatures || []);
+        } else {
+          setAboutMe(typeof data === 'string' ? data : '');
+          setAboutMeImage('');
+          setLocationImageUrl('');
+          setLocationHeading('');
+          setLocationParagraph('');
+          setLocationFeatures([]);
+        }
+      } catch (e) {
+        setAboutMe('');
+        setAboutMeImage('');
+        setLocationImageUrl('');
+        setLocationHeading('');
+        setLocationParagraph('');
+        setLocationFeatures([]);
+      } finally {
+        setLoading(false);
+        setLocationLoading(false);
+      }
+    }
+    async function loadIntro() {
+      setIntroLoading(true);
+      try {
+        const data = await fetchResource('HomeIntro');
+        setHomeIntro(data);
+      } catch {
+        setHomeIntro(null);
+      } finally {
+        setIntroLoading(false);
+      }
+    }
+    async function loadPhilosophy() {
+      setPhilosophyLoading(true);
+      try {
+        const data = await fetchResource('Philosophy');
+        setPhilosophy(data);
+      } catch {
+        setPhilosophy(null);
+      } finally {
+        setPhilosophyLoading(false);
+      }
+    }
+    loadAboutMe();
+    loadIntro();
+    loadPhilosophy();
+  }, []);
+
   return (
     <div className="min-h-screen bg-cream-50">
       {/* Hero Section */}
@@ -21,51 +107,20 @@ const About: React.FC = () => {
         </div>
       </section>
 
-      {/* Story Section */}
+      {/* About Me Section */}
       <section className="section-padding bg-cream-100">
         <div className="container-custom">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-            >
-              <h2 className="text-4xl font-serif font-semibold text-sage-800 mb-6">
-                My Story
-              </h2>
-              <p className="text-lg text-sage-700 mb-6">
-                Hi, I'm Jessi Bradford, a passionate photographer based in Salina, Utah. 
-                I fell in love with photography as a way to capture the authentic moments 
-                that make life truly beautiful.
-              </p>
-              <p className="text-lg text-sage-700 mb-6">
-                My journey began with a simple camera and a desire to tell stories through images. 
-                Over the years, I've developed a signature moody, artistic style that brings out 
-                the natural beauty and emotion in every subject.
-              </p>
-              <p className="text-lg text-sage-700">
-                I specialize in portrait, couple, and family photography, creating timeless images 
-                that families will treasure for generations. Every session is an opportunity to 
-                capture genuine moments and create lasting memories.
-              </p>
-            </motion.div>
-            
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-              className="relative"
-            >
-              <div className="aspect-square bg-sage-200 rounded-lg overflow-hidden">
-                <img
-                  src="/api/placeholder/600/600"
-                  alt="Jessi Bradford"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </motion.div>
+          <div className="flex flex-col md:flex-row gap-12 items-center">
+            {aboutMeImage && (
+              <img src={aboutMeImage} alt="About Me" className="w-64 h-64 object-cover rounded-lg shadow mb-6 md:mb-0" />
+            )}
+            <div>
+              {loading ? (
+                <p className="text-lg text-sage-700 mb-6">Loading...</p>
+              ) : (
+                <p className="text-lg text-sage-700 mb-6 whitespace-pre-line">{aboutMe || 'No About Me content set yet.'}</p>
+              )}
+            </div>
           </div>
         </div>
       </section>
@@ -73,59 +128,25 @@ const About: React.FC = () => {
       {/* Philosophy Section */}
       <section className="section-padding bg-sage-50">
         <div className="container-custom">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-4xl font-serif font-semibold text-sage-800 mb-6">
-              My Photography Philosophy
-            </h2>
-            <p className="text-lg text-sage-600 max-w-3xl mx-auto">
-              I believe that the best photographs are those that capture genuine emotion and tell a story. 
-              My moody, artistic approach emphasizes natural beauty and authentic moments.
-            </p>
-          </motion.div>
-
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-serif font-semibold text-sage-800 mb-6">{philosophy?.heading || 'My Photography Philosophy'}</h2>
+            <p className="text-lg text-sage-600 max-w-3xl mx-auto">{philosophy?.description || ''}</p>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                icon: Heart,
-                title: 'Authentic Moments',
-                description: 'I focus on capturing real emotions and genuine interactions rather than posed perfection.'
-              },
-              {
-                icon: Camera,
-                title: 'Artistic Vision',
-                description: 'My moody, artistic style creates images that are both beautiful and emotionally compelling.'
-              },
-              {
-                icon: Award,
-                title: 'Quality & Care',
-                description: 'Every image is carefully crafted and edited to ensure the highest quality for my clients.'
-              }
-            ].map((item, index) => (
-              <motion.div
-                key={item.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.2 }}
-                viewport={{ once: true }}
-                className="bg-cream-200 p-8 rounded-lg shadow-lg text-center card-hover"
-              >
-                <div className="w-16 h-16 bg-sage-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <item.icon className="w-8 h-8 text-sage-600" />
+            {philosophyLoading ? (
+              <div className="col-span-full text-center text-sage-600">Loading...</div>
+            ) : (philosophy?.cards || []).map((card: any, idx: number) => {
+              const Icon = ICON_MAP[card.icon] || Heart;
+              return (
+                <div key={idx} className="bg-cream-200 p-8 rounded-lg shadow-lg text-center card-hover">
+                  <div className="w-16 h-16 bg-sage-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Icon className="w-8 h-8 text-sage-600" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-sage-800 mb-4">{card.title}</h3>
+                  <p className="text-sage-600">{card.description}</p>
                 </div>
-                <h3 className="text-xl font-semibold text-sage-800 mb-4">
-                  {item.title}
-                </h3>
-                <p className="text-sage-600">
-                  {item.description}
-                </p>
-              </motion.div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -143,41 +164,41 @@ const About: React.FC = () => {
             >
               <div className="aspect-[4/3] bg-sage-200 rounded-lg overflow-hidden">
                 <img
-                  src="/api/placeholder/600/450"
-                  alt="Salina, Utah"
+                  src={locationImageUrl || '/api/placeholder/600/450'}
+                  alt={locationHeading || 'Location'}
                   className="w-full h-full object-cover"
                 />
               </div>
             </motion.div>
-            
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-4xl font-serif font-semibold text-sage-800 mb-6">
-                Based in Salina, Utah
-              </h2>
-              <p className="text-lg text-sage-700 mb-6">
-                I'm proud to call Salina, Utah my home and serve the beautiful Sevier County area. 
-                The stunning landscapes and natural beauty of Southern Utah provide the perfect backdrop 
-                for creating memorable photography sessions.
-              </p>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <MapPin className="w-6 h-6 text-sage-600" />
-                  <span className="text-sage-700">Serving Sevier County and surrounding areas</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Camera className="w-6 h-6 text-sage-600" />
-                  <span className="text-sage-700">Outdoor and studio sessions available</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Heart className="w-6 h-6 text-sage-600" />
-                  <span className="text-sage-700">Travel to your preferred location</span>
-                </div>
-              </div>
+              {locationLoading ? (
+                <p className="text-lg text-sage-700 mb-6">Loading...</p>
+              ) : (
+                <>
+                  <h2 className="text-4xl font-serif font-semibold text-sage-800 mb-6">
+                    {locationHeading}
+                  </h2>
+                  <p className="text-lg text-sage-700 mb-6">
+                    {locationParagraph}
+                  </p>
+                  <div className="space-y-4">
+                    {(locationFeatures || []).map((feature, idx) => {
+                      const Icon = LOCATION_ICON_MAP[feature.icon] || MapPin;
+                      return (
+                        <div key={idx} className="flex items-center space-x-3">
+                          <Icon className="w-6 h-6 text-sage-600" />
+                          <span className="text-sage-700">{feature.text}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
             </motion.div>
           </div>
         </div>

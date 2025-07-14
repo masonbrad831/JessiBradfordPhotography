@@ -1,0 +1,20 @@
+[
+  {
+    "id": "1",
+    "title": "Additional Images",
+    "price": "$25 each",
+    "description": "Add more high-resolution images to your gallery"
+  },
+  {
+    "id": "2",
+    "title": "Rush Editing",
+    "price": "$50",
+    "description": "Get your images within 48 hours instead of 1-2 weeks"
+  },
+  {
+    "id": "3",
+    "title": "Print Products",
+    "price": "Starting at $15",
+    "description": "Professional prints, canvases, and albums available"
+  }
+] 

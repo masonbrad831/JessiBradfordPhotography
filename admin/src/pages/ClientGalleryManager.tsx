@@ -1,40 +1,26 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Plus, Eye, Lock, Download, Share2, Edit } from 'lucide-react';
+import { fetchResource } from '../api';
 
 const ClientGalleryManager: React.FC = () => {
-  const galleries = [
-    {
-      id: '1',
-      clientName: 'Sarah Johnson',
-      sessionType: 'Family Session',
-      photoCount: 45,
-      status: 'active',
-      accessCode: 'SJ2024',
-      createdAt: '2024-01-15',
-      lastAccessed: '2024-01-20'
-    },
-    {
-      id: '2',
-      clientName: 'Mike & Lisa Chen',
-      sessionType: 'Couple Session',
-      photoCount: 32,
-      status: 'active',
-      accessCode: 'ML2024',
-      createdAt: '2024-01-18',
-      lastAccessed: '2024-01-22'
-    },
-    {
-      id: '3',
-      clientName: 'Emma Davis',
-      sessionType: 'Portrait Session',
-      photoCount: 28,
-      status: 'expired',
-      accessCode: 'ED2024',
-      createdAt: '2024-01-10',
-      lastAccessed: '2024-01-25'
+  const [galleries, setGalleries] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadGalleries() {
+      setLoading(true);
+      try {
+        const galleriesData = await fetchResource('ClientGallery');
+        setGalleries(Array.isArray(galleriesData) ? galleriesData : []);
+      } catch (e) {
+        setGalleries([]);
+      } finally {
+        setLoading(false);
+      }
     }
-  ];
+    loadGalleries();
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -65,60 +51,66 @@ const ClientGalleryManager: React.FC = () => {
 
       {/* Galleries Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {galleries.map((gallery, index) => (
-          <motion.div
-            key={gallery.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
-            className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-sage-100 rounded-lg flex items-center justify-center">
-                <Users className="w-6 h-6 text-sage-600" />
+        {loading ? (
+          <div className="col-span-full text-center text-gray-500">Loading galleries...</div>
+        ) : galleries.length === 0 ? (
+          <div className="col-span-full text-center text-gray-500">No galleries found.</div>
+        ) : (
+          galleries.map((gallery, index) => (
+            <motion.div
+              key={gallery.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-sage-100 rounded-lg flex items-center justify-center">
+                  <Users className="w-6 h-6 text-sage-600" />
+                </div>
+                <div className="flex space-x-2">
+                  <button className="p-2 text-gray-400 hover:text-gray-600">
+                    <Eye className="w-4 h-4" />
+                  </button>
+                  <button className="p-2 text-gray-400 hover:text-gray-600">
+                    <Edit className="w-4 h-4" />
+                  </button>
+                  <button className="p-2 text-gray-400 hover:text-gray-600">
+                    <Share2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
-              <div className="flex space-x-2">
-                <button className="p-2 text-gray-400 hover:text-gray-600">
-                  <Eye className="w-4 h-4" />
+              
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">{gallery.clientName}</h3>
+              <p className="text-sm text-gray-600 mb-2">{gallery.sessionType}</p>
+              <p className="text-sm text-gray-500 mb-4">{gallery.photoCount} photos</p>
+              
+              <div className="space-y-3 mb-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Access Code:</span>
+                  <span className="text-sm font-mono bg-gray-100 px-2 py-1 rounded">{gallery.accessCode}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Status:</span>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(gallery.status)}`}>
+                    {gallery.status}
+                  </span>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-3 pt-4 border-t border-gray-100">
+                <button className="btn-primary text-sm py-1 px-3 flex items-center space-x-1">
+                  <Lock className="w-3 h-3" />
+                  <span>Manage Access</span>
                 </button>
-                <button className="p-2 text-gray-400 hover:text-gray-600">
-                  <Edit className="w-4 h-4" />
-                </button>
-                <button className="p-2 text-gray-400 hover:text-gray-600">
-                  <Share2 className="w-4 h-4" />
+                <button className="btn-secondary text-sm py-1 px-3 flex items-center space-x-1">
+                  <Download className="w-3 h-3" />
+                  <span>Download</span>
                 </button>
               </div>
-            </div>
-            
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">{gallery.clientName}</h3>
-            <p className="text-sm text-gray-600 mb-2">{gallery.sessionType}</p>
-            <p className="text-sm text-gray-500 mb-4">{gallery.photoCount} photos</p>
-            
-            <div className="space-y-3 mb-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Access Code:</span>
-                <span className="text-sm font-mono bg-gray-100 px-2 py-1 rounded">{gallery.accessCode}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Status:</span>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(gallery.status)}`}>
-                  {gallery.status}
-                </span>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-3 pt-4 border-t border-gray-100">
-              <button className="btn-primary text-sm py-1 px-3 flex items-center space-x-1">
-                <Lock className="w-3 h-3" />
-                <span>Manage Access</span>
-              </button>
-              <button className="btn-secondary text-sm py-1 px-3 flex items-center space-x-1">
-                <Download className="w-3 h-3" />
-                <span>Download</span>
-              </button>
-            </div>
-          </motion.div>
-        ))}
+            </motion.div>
+          ))
+        )}
       </div>
 
       {/* Quick Stats */}

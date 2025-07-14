@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, Clock, User, CheckCircle, XCircle, MessageSquare, X, Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { fetchResource, saveResource } from '../api';
 
 const BookingManager: React.FC = () => {
   const [isCalendarView, setIsCalendarView] = useState(false);
@@ -15,54 +16,32 @@ const BookingManager: React.FC = () => {
     time: '',
     notes: ''
   });
-
-  const bookings = [
-    {
-      id: '1',
-      clientName: 'Sarah Johnson',
-      service: 'Family Session',
-      date: '2024-02-15',
-      time: '2:00 PM',
-      status: 'pending',
-      email: 'sarah@email.com',
-      phone: '(555) 123-4567'
-    },
-    {
-      id: '2',
-      clientName: 'Mike & Lisa Chen',
-      service: 'Couple Session',
-      date: '2024-02-18',
-      time: '4:00 PM',
-      status: 'confirmed',
-      email: 'mike@email.com',
-      phone: '(555) 234-5678'
-    },
-    {
-      id: '3',
-      clientName: 'Emma Davis',
-      service: 'Portrait Session',
-      date: '2024-02-20',
-      time: '10:00 AM',
-      status: 'pending',
-      email: 'emma@email.com',
-      phone: '(555) 345-6789'
-    }
-  ];
-
-  const services = [
-    'Family Session',
-    'Couple Session',
-    'Portrait Session',
-    'Engagement Session',
-    'Wedding Photography',
-    'Event Photography'
-  ];
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [services, setServices] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const timeSlots = [
     '9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM',
     '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM',
     '5:00 PM', '6:00 PM'
   ];
+
+  useEffect(() => {
+    async function loadData() {
+      setLoading(true);
+      try {
+        const bookingsData = await fetchResource('Booking');
+        setBookings(Array.isArray(bookingsData) ? bookingsData : []);
+        const servicesData = await fetchResource('SessionTypes');
+        setServices(Array.isArray(servicesData) ? servicesData.map((s: any) => s.name) : []);
+      } catch (e) {
+        toast.error('Failed to load bookings or services');
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -90,30 +69,32 @@ const BookingManager: React.FC = () => {
     }
   };
 
-  const handleNewBookingSubmit = (e: React.FormEvent) => {
+  const handleNewBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Validate form
     if (!newBooking.clientName || !newBooking.email || !newBooking.service || !newBooking.date || !newBooking.time) {
       toast.error('Please fill in all required fields');
       return;
     }
-
-    // TODO: Send to API
-    console.log('New booking:', newBooking);
-    toast.success('Booking created successfully!');
-    
-    // Reset form and close modal
-    setNewBooking({
-      clientName: '',
-      email: '',
-      phone: '',
-      service: '',
-      date: '',
-      time: '',
-      notes: ''
-    });
-    setShowNewBookingModal(false);
+    try {
+      const newId = Date.now().toString();
+      const bookingToSave = { ...newBooking, id: newId, status: 'pending' };
+      const updatedBookings = [...bookings, bookingToSave];
+      await saveResource('Booking', updatedBookings);
+      setBookings(updatedBookings);
+      toast.success('Booking created successfully!');
+      setNewBooking({
+        clientName: '',
+        email: '',
+        phone: '',
+        service: '',
+        date: '',
+        time: '',
+        notes: ''
+      });
+      setShowNewBookingModal(false);
+    } catch (e) {
+      toast.error('Failed to create booking');
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -198,56 +179,77 @@ const BookingManager: React.FC = () => {
           <h2 className="text-lg font-semibold text-gray-900">Recent Bookings</h2>
         </div>
         <div className="divide-y divide-gray-200">
-          {bookings.map((booking, index) => (
-            <motion.div
-              key={booking.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="p-6 hover:bg-gray-50 transition-colors"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  {getStatusIcon(booking.status)}
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900">{booking.clientName}</h3>
-                    <p className="text-sm text-gray-600">{booking.service}</p>
-                    <p className="text-sm text-gray-500">{booking.email} • {booking.phone}</p>
+          {loading ? (
+            <div className="p-6 text-center text-gray-500">Loading bookings...</div>
+          ) : bookings.length === 0 ? (
+            <div className="p-6 text-center text-gray-500">No bookings found.</div>
+          ) : (
+            bookings.map((booking, index) => (
+              <motion.div
+                key={booking.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="p-6 hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    {getStatusIcon(booking.status)}
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">{booking.clientName}</h3>
+                      <p className="text-sm text-gray-600">{booking.service}</p>
+                      <p className="text-sm text-gray-500">{booking.email} • {booking.phone}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="text-right">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Calendar className="w-4 h-4 text-gray-400" />
+                      <span className="text-sm font-medium text-gray-900">{booking.date}</span>
+                    </div>
+                    <div className="flex items-center space-x-2 mb-3">
+                      <Clock className="w-4 h-4 text-gray-400" />
+                      <span className="text-sm text-gray-600">{booking.time}</span>
+                    </div>
+                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(booking.status)}`}>
+                      {booking.status}
+                    </span>
                   </div>
                 </div>
                 
-                <div className="text-right">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <Calendar className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm font-medium text-gray-900">{booking.date}</span>
-                  </div>
-                  <div className="flex items-center space-x-2 mb-3">
-                    <Clock className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm text-gray-600">{booking.time}</span>
-                  </div>
-                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(booking.status)}`}>
-                    {booking.status}
-                  </span>
+                <div className="flex items-center space-x-3 mt-4 pt-4 border-t border-gray-100">
+                  <button
+                    className="btn-primary text-sm py-1 px-3"
+                    onClick={async () => {
+                      const updatedBookings = bookings.map(b =>
+                        b.id === booking.id ? { ...b, status: 'confirmed' } : b
+                      );
+                      setBookings(updatedBookings);
+                      try {
+                        await saveResource('Booking', updatedBookings);
+                        toast.success('Booking confirmed!');
+                      } catch (e) {
+                        toast.error('Failed to confirm booking');
+                      }
+                    }}
+                    disabled={booking.status === 'confirmed'}
+                  >
+                    Accept
+                  </button>
+                  <button className="btn-secondary text-sm py-1 px-3">
+                    Suggest Alternative
+                  </button>
+                  <button className="text-red-600 hover:text-red-800 text-sm py-1 px-3">
+                    Decline
+                  </button>
+                  <button className="flex items-center space-x-1 text-gray-600 hover:text-gray-800 text-sm py-1 px-3">
+                    <MessageSquare className="w-4 h-4" />
+                    <span>Message</span>
+                  </button>
                 </div>
-              </div>
-              
-              <div className="flex items-center space-x-3 mt-4 pt-4 border-t border-gray-100">
-                <button className="btn-primary text-sm py-1 px-3">
-                  Accept
-                </button>
-                <button className="btn-secondary text-sm py-1 px-3">
-                  Suggest Alternative
-                </button>
-                <button className="text-red-600 hover:text-red-800 text-sm py-1 px-3">
-                  Decline
-                </button>
-                <button className="flex items-center space-x-1 text-gray-600 hover:text-gray-800 text-sm py-1 px-3">
-                  <MessageSquare className="w-4 h-4" />
-                  <span>Message</span>
-                </button>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))
+          )}
         </div>
       </div>
 

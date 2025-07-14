@@ -1,0 +1,47 @@
+[
+  {
+    "id": "1752512881217",
+    "name": "Portrait Session",
+    "price": 150,
+    "duration": "1h",
+    "description": "Individual or family portrait sessions in beautiful outdoor locations or studio.",
+    "includes": [
+      "1 hour photography session",
+      "Professional editing of 20+ images",
+      "Online gallery with 10 high-resolution downloads",
+      "Print release for personal use",
+      "Location consultation"
+    ],
+    "photoCount": 20
+  },
+  {
+    "id": "1752512968248",
+    "name": "Couple Session",
+    "price": 200,
+    "duration": "1h 30m",
+    "description": "Romantic couple sessions perfect for engagements, anniversaries, or just because.",
+    "includes": [
+      "1.5 hour photography session",
+      "Professional editing of 25+ images",
+      "Online gallery with 15 high-resolution downloads",
+      "Print release for personal use",
+      "Location consultation",
+      "Outfit guidance"
+    ],
+    "photoCount": 15
+  },
+  {
+    "id": "1752518682224",
+    "name": "Mini Session",
+    "price": 100,
+    "duration": "30m",
+    "description": "small shit",
+    "includes": [
+      "Professional Edititing",
+      "more",
+      "good shit"
+    ],
+    "photoCount": 5,
+    "icon": "Clock"
+  }
+]
