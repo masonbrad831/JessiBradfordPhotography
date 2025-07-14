@@ -1,0 +1,78 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./src/**/*.{js,jsx,ts,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        sage: {
+          50: '#f6f7f6',
+          100: '#e3e7e3',
+          200: '#c7cfc7',
+          300: '#a3b1a3',
+          400: '#7a8f7a',
+          500: '#5a715a',
+          600: '#475a47',
+          700: '#3a483a',
+          800: '#2f3a2f',
+          900: '#283028',
+        },
+        cream: {
+          50: '#fefefe',
+          100: '#fdfcfb',
+          200: '#faf8f4',
+          300: '#f5f1e9',
+          400: '#ede6d8',
+          500: '#e0d5c2',
+          600: '#d1c3ac',
+          700: '#b8a88c',
+          800: '#9a8b6f',
+          900: '#7d6f5a',
+        },
+        terracotta: {
+          50: '#fdf4f3',
+          100: '#fbe8e5',
+          200: '#f6d3ce',
+          300: '#efb5ad',
+          400: '#e58f82',
+          500: '#d97366',
+          600: '#c55a4d',
+          700: '#a6473d',
+          800: '#8a3d35',
+          900: '#723530',
+        },
+        brown: {
+          50: '#fdf8f6',
+          100: '#fbe8e3',
+          200: '#f6d3c8',
+          300: '#efb5a3',
+          400: '#e58f74',
+          500: '#d97355',
+          600: '#c55a3d',
+          700: '#a64732',
+          800: '#8a3d2c',
+          900: '#723528',
+        },
+        green: {
+          50: '#f0f9f0',
+          100: '#dcefdc',
+          200: '#bbdbbb',
+          300: '#8fc18f',
+          400: '#5da35d',
+          500: '#3d853d',
+          600: '#2f6a2f',
+          700: '#285428',
+          800: '#234423',
+          900: '#1e391e',
+        }
+      },
+      fontFamily: {
+        'serif': ['Playfair Display', 'serif'],
+        'cursive': ['Dancing Script', 'cursive'],
+        'vintage': ['Playfair Display', 'serif'],
+      },
+    },
+  },
+  plugins: [],
+} 

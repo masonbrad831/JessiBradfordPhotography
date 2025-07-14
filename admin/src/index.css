@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f9fafb;
+    color: #374151;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-sage-600 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300 hover:bg-sage-700 focus:ring-2 focus:ring-sage-500 focus:ring-offset-2;
+  }
+  
+  .btn-secondary {
+    @apply bg-white border border-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg transition-all duration-300 hover:bg-gray-50 focus:ring-2 focus:ring-sage-500 focus:ring-offset-2;
+  }
+  
+  .card {
+    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
+  }
+  
+  .input-field {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sage-500 focus:border-transparent transition-all duration-300;
+  }
+  
+  .status-badge {
+    @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-medium;
+  }
+  
+  .status-pending {
+    @apply bg-orange-100 text-orange-800;
+  }
+  
+  .status-confirmed {
+    @apply bg-green-100 text-green-800;
+  }
+  
+  .status-cancelled {
+    @apply bg-red-100 text-red-800;
+  }
+} 
