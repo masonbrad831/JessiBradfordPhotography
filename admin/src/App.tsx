@@ -8,6 +8,10 @@ import PortfolioManager from './pages/PortfolioManager';
 import BookingManager from './pages/BookingManager';
 import ClientGalleryManager from './pages/ClientGalleryManager';
 import Settings from './pages/Settings';
+import SlideshowManager from './pages/SlideshowManager';
+import FeaturedWorkManager from './pages/FeaturedWorkManager';
+import ReviewsManager from './pages/ReviewsManager';
+import AvailabilityCalendar from './pages/AvailabilityCalendar';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -32,6 +36,10 @@ function App() {
               <Route path="portfolio" element={<PortfolioManager />} />
               <Route path="bookings" element={<BookingManager />} />
               <Route path="client-galleries" element={<ClientGalleryManager />} />
+              <Route path="slideshow" element={<SlideshowManager />} />
+              <Route path="featured-work" element={<FeaturedWorkManager />} />
+              <Route path="reviews" element={<ReviewsManager />} />
+              <Route path="availability" element={<AvailabilityCalendar />} />
               <Route path="settings" element={<Settings />} />
             </Route>
           </Routes>
