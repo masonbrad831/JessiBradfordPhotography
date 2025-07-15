@@ -28,7 +28,8 @@
       "Location consultation",
       "Outfit guidance"
     ],
-    "photoCount": 15
+    "photoCount": 15,
+    "icon": "Heart"
   },
   {
     "id": "1752543134673",
@@ -40,6 +41,19 @@
       "Quick Session"
     ],
     "photoCount": 15,
-    "icon": "Camera"
+    "icon": "Clock"
+  },
+  {
+    "id": "1752552591335",
+    "name": "test",
+    "price": 1000000,
+    "duration": "6h",
+    "description": "test",
+    "includes": [
+      "test",
+      "test"
+    ],
+    "photoCount": 100,
+    "icon": "Heart"
   }
 ]

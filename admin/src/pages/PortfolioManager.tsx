@@ -3,19 +3,34 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Image, Plus, Trash2, Edit, Eye, X, Star, StarOff } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { fetchResource, saveResource } from '../api';
+import { useNavigate } from 'react-router-dom';
+
+interface Photo {
+  id: string;
+  title: string;
+  imageUrl: string;
+  category: string;
+  description?: string;
+  isActive?: boolean;
+  isStarred?: boolean;
+}
+
+interface Portfolio {
+  id: string;
+  title: string;
+  description: string;
+  photos: Photo[];
+  showOnClient?: boolean;
+}
 
 const PortfolioManager: React.FC = () => {
-  const [photos, setPhotos] = useState<any[]>([]);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [editingPhoto, setEditingPhoto] = useState<any>(null);
-  const [newPhoto, setNewPhoto] = useState({
-    title: '',
-    imageUrl: '',
-    category: '',
-    description: ''
-  });
+  const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [showAddPortfolio, setShowAddPortfolio] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [portfolioToDelete, setPortfolioToDelete] = useState<Portfolio | null>(null);
+  const [newPortfolio, setNewPortfolio] = useState({ title: '', description: '', showOnClient: true });
+  const navigate = useNavigate();
 
   const categories = [
     'family',
@@ -27,407 +42,245 @@ const PortfolioManager: React.FC = () => {
   ];
 
   useEffect(() => {
-    async function loadPhotos() {
-      setLoading(true);
-      try {
-        const portfolioData = await fetchResource('Portfolio');
-        if (portfolioData && Array.isArray(portfolioData.photos)) {
-          setPhotos(portfolioData.photos);
-        } else {
-          setPhotos([]);
-        }
-      } catch (e) {
-        setPhotos([]);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadPhotos();
+    loadPortfolios();
   }, []);
 
-  const handleAddPhoto = async () => {
-    if (!newPhoto.title || !newPhoto.imageUrl || !newPhoto.category) {
-      toast.error('Please fill in all required fields');
+  const loadPortfolios = async () => {
+    setLoading(true);
+    try {
+      const data = await fetchResource('Portfolio');
+      setPortfolios(Array.isArray(data) ? data : []);
+    } catch (e) {
+      setPortfolios([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddPortfolio = async () => {
+    if (!newPortfolio.title) {
+      toast.error('Portfolio title is required');
       return;
     }
-    try {
-      const photo = {
-        id: Date.now().toString(),
-        ...newPhoto,
-        isActive: true,
-        isStarred: false
-      };
-      const updatedPhotos = [...photos, photo];
-      await saveResource('Portfolio', { photos: updatedPhotos });
-      setPhotos(updatedPhotos);
-      setNewPhoto({ title: '', imageUrl: '', category: '', description: '' });
-      setShowAddModal(false);
-      toast.success('Photo added to portfolio');
-    } catch (e) {
-      toast.error('Failed to add photo');
-    }
+    const newId = Date.now().toString();
+    const updated = [
+      ...portfolios,
+      { id: newId, title: newPortfolio.title, description: newPortfolio.description, photos: [], showOnClient: newPortfolio.showOnClient }
+    ];
+    await saveResource('Portfolio', updated);
+    setPortfolios(updated);
+    setNewPortfolio({ title: '', description: '', showOnClient: true });
+    setShowAddPortfolio(false);
+    toast.success('Portfolio added');
   };
 
-  const handleEditPhoto = async () => {
-    if (!editingPhoto.title || !editingPhoto.imageUrl || !editingPhoto.category) {
-      toast.error('Please fill in all required fields');
-      return;
-    }
-    try {
-      const updatedPhotos = photos.map(photo =>
-        photo.id === editingPhoto.id ? editingPhoto : photo
-      );
-      await saveResource('Portfolio', { photos: updatedPhotos });
-      setPhotos(updatedPhotos);
-      setEditingPhoto(null);
-      toast.success('Photo updated');
-    } catch (e) {
-      toast.error('Failed to update photo');
-    }
+  const handleDeletePortfolio = async () => {
+    if (!portfolioToDelete) return;
+    const updated = portfolios.filter(p => p.id !== portfolioToDelete.id);
+    await saveResource('Portfolio', updated);
+    setPortfolios(updated);
+    setPortfolioToDelete(null);
+    setShowDeleteModal(false);
+    toast.success('Portfolio deleted');
   };
 
-  const handleDeletePhoto = async (id: string) => {
-    try {
-      const updatedPhotos = photos.filter(photo => photo.id !== id);
-      await saveResource('Portfolio', { photos: updatedPhotos });
-      setPhotos(updatedPhotos);
-      toast.success('Photo removed from portfolio');
-    } catch (e) {
-      toast.error('Failed to remove photo');
-    }
+  const handleRemovePortfolio = (portfolio: Portfolio) => {
+    setPortfolioToDelete(portfolio);
+    setShowDeleteModal(true);
   };
 
-  const handleToggleActive = async (id: string) => {
-    try {
-      const updatedPhotos = photos.map(photo =>
-        photo.id === id ? { ...photo, isActive: !photo.isActive } : photo
-      );
-      await saveResource('Portfolio', { photos: updatedPhotos });
-      setPhotos(updatedPhotos);
-    } catch (e) {
-      toast.error('Failed to update status');
-    }
+  const handleToggleShowOnClient = async (id: string) => {
+    const updated = portfolios.map(p => p.id === id ? { ...p, showOnClient: !p.showOnClient } : p);
+    await saveResource('Portfolio', updated);
+    setPortfolios(updated);
   };
-
-  const handleToggleStarred = async (id: string) => {
-    try {
-      const updatedPhotos = photos.map(photo =>
-        photo.id === id ? { ...photo, isStarred: !photo.isStarred } : photo
-      );
-      await saveResource('Portfolio', { photos: updatedPhotos });
-      setPhotos(updatedPhotos);
-      
-      // Also update FeaturedWork if starring
-      const photo = photos.find(p => p.id === id);
-      if (photo && !photo.isStarred) {
-        // Add to featured work
-        const featuredData = await fetchResource('FeaturedWork');
-        let featuredItems = [];
-        if (featuredData && Array.isArray(featuredData.items)) {
-          featuredItems = featuredData.items;
-        }
-        
-        const newFeaturedItem = {
-          id: photo.id,
-          title: photo.title,
-          imageUrl: photo.imageUrl,
-          category: photo.category,
-          isActive: true,
-          order: featuredItems.length + 1
-        };
-        
-        const updatedFeaturedItems = [...featuredItems, newFeaturedItem];
-        await saveResource('FeaturedWork', { 
-          sectionDescription: featuredData?.sectionDescription || "A glimpse into my artistic vision and the beautiful moments I've captured",
-          items: updatedFeaturedItems 
-        });
-        toast.success('Photo added to featured work!');
-      } else if (photo && photo.isStarred) {
-        // Remove from featured work
-        const featuredData = await fetchResource('FeaturedWork');
-        if (featuredData && Array.isArray(featuredData.items)) {
-          const updatedFeaturedItems = featuredData.items.filter((item: any) => item.id !== id);
-          await saveResource('FeaturedWork', { 
-            sectionDescription: featuredData.sectionDescription,
-            items: updatedFeaturedItems 
-          });
-          toast.success('Photo removed from featured work!');
-        }
-      }
-    } catch (e) {
-      toast.error('Failed to update starred status');
-    }
-  };
-
-  const filteredPhotos = selectedCategory === 'all' 
-    ? photos 
-    : photos.filter(photo => photo.category === selectedCategory);
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="space-y-8">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Portfolio Management</h1>
-          <p className="text-gray-600">Manage your portfolio photos and star them for featured work</p>
-        </div>
-        <button 
-          onClick={() => setShowAddModal(true)}
-          className="btn-primary flex items-center space-x-2"
+        <h1 className="text-3xl font-bold text-gray-900">Portfolio Manager</h1>
+        <button
+          onClick={() => setShowAddPortfolio(true)}
+          className="btn-primary flex items-center gap-2"
         >
-          <Plus className="w-4 h-4" />
-          <span>Add Photo</span>
+          <Plus className="w-4 h-4" /> Add Portfolio
         </button>
       </div>
-
-      {/* Filter */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Filter by Category</h2>
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => setSelectedCategory('all')}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-              selectedCategory === 'all'
-                ? 'bg-sage-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            All
-          </button>
-          {categories.map((category) => (
-            <button
-              key={category}
-              onClick={() => setSelectedCategory(category)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                selectedCategory === category
-                  ? 'bg-sage-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              {category.charAt(0).toUpperCase() + category.slice(1)}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Photos Grid */}
+      {/* List of Portfolios */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {loading ? (
-          <p>Loading photos...</p>
-        ) : filteredPhotos.length === 0 ? (
-          <p>No photos found. Add some to your portfolio!</p>
+          <p>Loading portfolios...</p>
+        ) : portfolios.length === 0 ? (
+          <p>No portfolios found. Add one!</p>
         ) : (
-          filteredPhotos.map((photo, index) => (
+          portfolios.map((portfolio) => (
             <motion.div
-              key={photo.id}
+              key={portfolio.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
+              className="bg-white rounded-lg shadow-md border border-gray-200 p-6 flex flex-col cursor-pointer hover:shadow-xl transition"
+              onClick={() => navigate(`/portfolio-manager/${portfolio.id}`)}
             >
-              <div className="aspect-[4/3] bg-gray-200 overflow-hidden relative">
-                <img
-                  src={photo.imageUrl}
-                  alt={photo.title}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute top-2 right-2 flex space-x-2">
-                  <button
-                    onClick={() => handleToggleStarred(photo.id)}
-                    className={`p-2 rounded-full transition-colors ${
-                      photo.isStarred
-                        ? 'bg-yellow-500 text-white'
-                        : 'bg-white/80 text-gray-600 hover:bg-yellow-500 hover:text-white'
-                    }`}
-                  >
-                    {photo.isStarred ? <Star className="w-4 h-4 fill-current" /> : <StarOff className="w-4 h-4" />}
-                  </button>
-                  <button
-                    onClick={() => handleToggleActive(photo.id)}
-                    className={`p-2 rounded-full transition-colors ${
-                      photo.isActive
-                        ? 'bg-green-500 text-white'
-                        : 'bg-red-500 text-white'
-                    }`}
-                  >
-                    <Eye className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-              <div className="p-4">
-                <div className="flex items-start justify-between mb-2">
-                  <h3 className="text-lg font-semibold text-gray-900">{photo.title}</h3>
-                  <div className="flex space-x-1">
-                    <button
-                      onClick={() => setEditingPhoto(photo)}
-                      className="p-1 text-gray-400 hover:text-gray-600"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDeletePhoto(photo.id)}
-                      className="p-1 text-gray-400 hover:text-red-600"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+              <div className="flex justify-between items-center mb-2">
+                <div>
+                  <h2 className="text-xl font-semibold text-wood-800 flex items-center gap-2">
+                    <Image className="w-6 h-6 text-sage-600" />
+                    {portfolio.title}
+                  </h2>
+                  <p className="text-wood-600 text-sm mb-1">{portfolio.description}</p>
+                  <p className="text-xs text-wood-500">{portfolio.photos.length} photo(s)</p>
+                  {/* Replace the checkbox with a styled toggle switch in the portfolio list */}
+                  <div className="flex items-center gap-2 mt-1">
+                    <label className="flex items-center gap-2 text-xs cursor-pointer select-none">
+                      <span>Show on Client Site</span>
+                      <button
+                        type="button"
+                        aria-pressed={portfolio.showOnClient !== false}
+                        onClick={e => { e.stopPropagation(); handleToggleShowOnClient(portfolio.id); }}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${portfolio.showOnClient !== false ? 'bg-sage-600' : 'bg-gray-300'}`}
+                        tabIndex={0}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${portfolio.showOnClient !== false ? 'translate-x-6' : 'translate-x-1'}`}
+                        />
+                      </button>
+                    </label>
                   </div>
                 </div>
-                <p className="text-sm text-gray-600 capitalize mb-2">
-                  {photo.category} Photography
-                </p>
-                {photo.description && (
-                  <p className="text-sm text-gray-500">{photo.description}</p>
-                )}
-                <div className="flex items-center space-x-2 mt-3">
-                  <span className={`px-2 py-1 rounded-full text-xs ${
-                    photo.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                  }`}>
-                    {photo.isActive ? 'Active' : 'Inactive'}
-                  </span>
-                  {photo.isStarred && (
-                    <span className="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">
-                      Featured
-                    </span>
-                  )}
-                </div>
+                <button
+                  onClick={e => { e.stopPropagation(); handleRemovePortfolio(portfolio); }}
+                  className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
               </div>
             </motion.div>
           ))
         )}
       </div>
-
-      {/* Add/Edit Modal */}
+      {/* Add Portfolio Modal */}
       <AnimatePresence>
-        {(showAddModal || editingPhoto) && (
+        {showAddPortfolio && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-            onClick={() => {
-              setShowAddModal(false);
-              setEditingPhoto(null);
-            }}
+            className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+            onClick={() => setShowAddPortfolio(false)}
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto"
-              onClick={(e) => e.stopPropagation()}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={e => e.stopPropagation()}
+              className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto"
             >
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">
-                  {editingPhoto ? 'Edit Photo' : 'Add New Photo'}
-                </h2>
+              <div className="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
+                <h2 className="text-xl font-semibold text-gray-900">Add Portfolio</h2>
                 <button
-                  onClick={() => {
-                    setShowAddModal(false);
-                    setEditingPhoto(null);
-                  }}
+                  onClick={() => setShowAddPortfolio(false)}
                   className="text-gray-400 hover:text-gray-600"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
-
-              <div className="space-y-4">
+              <form
+                onSubmit={e => {
+                  e.preventDefault();
+                  handleAddPortfolio();
+                }}
+                className="p-6 space-y-4"
+              >
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Title *
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
                   <input
                     type="text"
-                    value={editingPhoto ? editingPhoto.title : newPhoto.title}
-                    onChange={(e) => {
-                      if (editingPhoto) {
-                        setEditingPhoto({ ...editingPhoto, title: e.target.value });
-                      } else {
-                        setNewPhoto({ ...newPhoto, title: e.target.value });
-                      }
-                    }}
+                    value={newPortfolio.title}
+                    onChange={e => setNewPortfolio({ ...newPortfolio, title: e.target.value })}
                     className="input-field"
-                    placeholder="Enter photo title"
+                    placeholder="Portfolio title"
+                    required
                   />
                 </div>
-
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Image URL *
-                  </label>
-                  <input
-                    type="url"
-                    value={editingPhoto ? editingPhoto.imageUrl : newPhoto.imageUrl}
-                    onChange={(e) => {
-                      if (editingPhoto) {
-                        setEditingPhoto({ ...editingPhoto, imageUrl: e.target.value });
-                      } else {
-                        setNewPhoto({ ...newPhoto, imageUrl: e.target.value });
-                      }
-                    }}
-                    className="input-field"
-                    placeholder="Enter image URL"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Category *
-                  </label>
-                  <select
-                    value={editingPhoto ? editingPhoto.category : newPhoto.category}
-                    onChange={(e) => {
-                      if (editingPhoto) {
-                        setEditingPhoto({ ...editingPhoto, category: e.target.value });
-                      } else {
-                        setNewPhoto({ ...newPhoto, category: e.target.value });
-                      }
-                    }}
-                    className="input-field"
-                  >
-                    <option value="">Select category</option>
-                    {categories.map((category) => (
-                      <option key={category} value={category}>
-                        {category.charAt(0).toUpperCase() + category.slice(1)}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Description
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
                   <textarea
-                    value={editingPhoto ? editingPhoto.description : newPhoto.description}
-                    onChange={(e) => {
-                      if (editingPhoto) {
-                        setEditingPhoto({ ...editingPhoto, description: e.target.value });
-                      } else {
-                        setNewPhoto({ ...newPhoto, description: e.target.value });
-                      }
-                    }}
+                    value={newPortfolio.description}
+                    onChange={e => setNewPortfolio({ ...newPortfolio, description: e.target.value })}
                     className="input-field"
-                    rows={3}
-                    placeholder="Enter photo description (optional)"
+                    placeholder="Portfolio description"
                   />
                 </div>
-
-                <div className="flex space-x-3 pt-4">
+                <div>
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                    <input
+                      type="checkbox"
+                      checked={newPortfolio.showOnClient}
+                      onChange={e => setNewPortfolio({ ...newPortfolio, showOnClient: e.target.checked })}
+                    />
+                    Show on Client Site
+                  </label>
+                </div>
+                <div className="flex space-x-3 pt-4 sticky bottom-0 bg-white border-t border-gray-200 -mx-6 px-6 py-4">
                   <button
-                    onClick={editingPhoto ? handleEditPhoto : handleAddPhoto}
-                    className="btn-primary flex-1"
-                  >
-                    {editingPhoto ? 'Update Photo' : 'Add Photo'}
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowAddModal(false);
-                      setEditingPhoto(null);
-                    }}
-                    className="btn-secondary flex-1"
+                    type="button"
+                    onClick={() => setShowAddPortfolio(false)}
+                    className="flex-1 btn-secondary"
                   >
                     Cancel
+                  </button>
+                  <button type="submit" className="flex-1 btn-primary">
+                    <Plus className="w-4 h-4 mr-1" /> Add
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      {/* Delete Portfolio Modal */}
+      <AnimatePresence>
+        {showDeleteModal && portfolioToDelete && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+            onClick={() => setShowDeleteModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={e => e.stopPropagation()}
+              className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto"
+            >
+              <div className="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
+                <h2 className="text-xl font-semibold text-red-700">Delete Portfolio</h2>
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="p-6 space-y-4">
+                <p className="text-lg text-red-700 font-semibold">Are you sure you want to delete this portfolio?</p>
+                <p className="text-wood-700">This will permanently delete <span className="font-bold">{portfolioToDelete.title}</span> and all <span className="font-bold">{portfolioToDelete.photos.length}</span> photos inside it. This action cannot be undone.</p>
+                <div className="flex space-x-3 pt-4 sticky bottom-0 bg-white border-t border-gray-200 -mx-6 px-6 py-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowDeleteModal(false)}
+                    className="flex-1 btn-secondary"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDeletePortfolio}
+                    className="flex-1 btn-danger"
+                  >
+                    <Trash2 className="w-4 h-4 mr-1" /> Delete
                   </button>
                 </div>
               </div>

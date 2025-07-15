@@ -10,68 +10,86 @@ import {
   CheckCircle,
   XCircle
 } from 'lucide-react';
+import { fetchResource } from '../api';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard: React.FC = () => {
-  // Mock data - replace with real API calls
+  const [loading, setLoading] = useState(true);
+  const [pendingBookings, setPendingBookings] = useState(0);
+  const [totalPortfolios, setTotalPortfolios] = useState(0);
+  const [clientGalleries, setClientGalleries] = useState(0);
+  const [recentBookings, setRecentBookings] = useState<any[]>([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    async function loadDashboard() {
+      setLoading(true);
+      try {
+        const bookings = await fetchResource('Booking');
+        const portfolios = await fetchResource('Portfolio');
+        const galleries = await fetchResource('ClientGallery');
+        setPendingBookings(Array.isArray(bookings) ? bookings.filter((b: any) => b.status === 'pending').length : 0);
+        // Robust sort: prefer id as number, fallback to date+time
+        let sorted = Array.isArray(bookings) ? [...bookings] : [];
+        sorted.sort((a: any, b: any) => {
+          const aId = Number(a.id);
+          const bId = Number(b.id);
+          if (!isNaN(aId) && !isNaN(bId)) {
+            return bId - aId;
+          }
+          // Fallback: sort by date+time descending
+          const aDate = new Date(a.date + 'T' + (a.time || '00:00'));
+          const bDate = new Date(b.date + 'T' + (b.time || '00:00'));
+          return bDate.getTime() - aDate.getTime();
+        });
+        setRecentBookings(sorted.slice(0, 5));
+        setTotalPortfolios(Array.isArray(portfolios) ? portfolios.length : 0);
+        setClientGalleries(Array.isArray(galleries) ? galleries.length : 0);
+      } catch {
+        setPendingBookings(0);
+        setRecentBookings([]);
+        setTotalPortfolios(0);
+        setClientGalleries(0);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadDashboard();
+  }, []);
+
   const stats = [
     {
       title: 'Pending Bookings',
-      value: '12',
-      change: '+3',
+      value: loading ? '...' : pendingBookings,
+      change: '',
       icon: Clock,
       color: 'text-orange-600',
       bgColor: 'bg-gradient-to-br from-orange-100 to-orange-200'
     },
     {
       title: 'Total Portfolios',
-      value: '8',
-      change: '+1',
+      value: loading ? '...' : totalPortfolios,
+      change: '',
       icon: Image,
       color: 'text-blue-600',
       bgColor: 'bg-gradient-to-br from-blue-100 to-blue-200'
     },
     {
       title: 'Client Galleries',
-      value: '24',
-      change: '+5',
+      value: loading ? '...' : clientGalleries,
+      change: '',
       icon: Users,
       color: 'text-green-600',
       bgColor: 'bg-gradient-to-br from-green-100 to-green-200'
     },
     {
       title: 'This Month',
-      value: '$2,450',
-      change: '+12%',
+      value: 'N/A',
+      change: '',
       icon: TrendingUp,
       color: 'text-purple-600',
       bgColor: 'bg-gradient-to-br from-purple-100 to-purple-200'
-    }
-  ];
-
-  const recentBookings = [
-    {
-      id: '1',
-      clientName: 'Sarah Johnson',
-      service: 'Family Session',
-      date: '2024-02-15',
-      time: '2:00 PM',
-      status: 'pending'
-    },
-    {
-      id: '2',
-      clientName: 'Mike & Lisa Chen',
-      service: 'Couple Session',
-      date: '2024-02-18',
-      time: '4:00 PM',
-      status: 'confirmed'
-    },
-    {
-      id: '3',
-      clientName: 'Emma Davis',
-      service: 'Portrait Session',
-      date: '2024-02-20',
-      time: '10:00 AM',
-      status: 'pending'
     }
   ];
 
@@ -109,16 +127,7 @@ const Dashboard: React.FC = () => {
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Dashboard</h1>
           <p className="text-lg text-gray-600">Welcome back! Here's what's happening today.</p>
         </div>
-        <div className="flex space-x-4">
-          <button className="btn-primary flex items-center space-x-3">
-            <Plus className="w-5 h-5" />
-            <span>New Booking</span>
-          </button>
-          <button className="btn-secondary flex items-center space-x-3">
-            <Image className="w-5 h-5" />
-            <span>Add Photos</span>
-          </button>
-        </div>
+        {/* Removed New Booking and Add Photos buttons */}
       </div>
 
       {/* Stats Grid */}
@@ -159,21 +168,23 @@ const Dashboard: React.FC = () => {
             <button className="text-sm font-semibold text-sage-600 hover:text-sage-800 transition-colors">View all</button>
           </div>
           <div className="space-y-4">
-            {recentBookings.map((booking) => (
-              <div key={booking.id} className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50/80 to-gray-100/80 backdrop-blur-sm rounded-xl border border-gray-200/60">
+            {loading ? (
+              <div className="text-center text-gray-500">Loading...</div>
+            ) : recentBookings.length === 0 ? (
+              <div className="text-center text-gray-500">No recent bookings.</div>
+            ) : recentBookings.map((booking) => (
+              <div key={booking.id || booking.clientName + booking.date + booking.time} className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50/80 to-gray-100/80 backdrop-blur-sm rounded-xl border border-gray-200/60">
                 <div className="flex items-center space-x-4">
                   {getStatusIcon(booking.status)}
                   <div>
-                    <p className="font-semibold text-gray-900">{booking.clientName}</p>
-                    <p className="text-sm font-medium text-gray-600">{booking.service}</p>
+                    <p className="font-semibold text-gray-900">{booking.clientName || 'Unknown'}</p>
+                    <p className="text-sm font-medium text-gray-600">{booking.service || 'N/A'}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-semibold text-gray-900">{booking.date}</p>
-                  <p className="text-sm font-medium text-gray-600">{booking.time}</p>
-                  <span className={`status-badge ${getStatusColor(booking.status)}`}>
-                    {booking.status}
-                  </span>
+                  <p className="text-sm font-semibold text-gray-900">{booking.date || 'N/A'}</p>
+                  <p className="text-sm font-medium text-gray-600">{booking.time || ''}</p>
+                  <span className={`status-badge ${getStatusColor(booking.status)}`}>{booking.status || 'pending'}</span>
                 </div>
               </div>
             ))}
@@ -189,7 +200,7 @@ const Dashboard: React.FC = () => {
         >
           <h2 className="text-xl font-bold text-gray-900 mb-6">Quick Actions</h2>
           <div className="space-y-4">
-            <button className="w-full flex items-center space-x-4 p-4 text-left hover:bg-gray-50/80 rounded-xl transition-all duration-300 group">
+            <button onClick={() => navigate('/portfolio-manager')} className="w-full flex items-center space-x-4 p-4 text-left hover:bg-gray-50/80 rounded-xl transition-all duration-300 group">
               <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
                 <Plus className="w-6 h-6 text-blue-600" />
               </div>
@@ -198,8 +209,7 @@ const Dashboard: React.FC = () => {
                 <p className="text-sm font-medium text-gray-600">Create a new photography portfolio</p>
               </div>
             </button>
-            
-            <button className="w-full flex items-center space-x-4 p-4 text-left hover:bg-gray-50/80 rounded-xl transition-all duration-300 group">
+            <button onClick={() => navigate('/availability')} className="w-full flex items-center space-x-4 p-4 text-left hover:bg-gray-50/80 rounded-xl transition-all duration-300 group">
               <div className="w-12 h-12 bg-gradient-to-br from-green-100 to-green-200 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
                 <Calendar className="w-6 h-6 text-green-600" />
               </div>
@@ -208,8 +218,7 @@ const Dashboard: React.FC = () => {
                 <p className="text-sm font-medium text-gray-600">Update your calendar and time slots</p>
               </div>
             </button>
-            
-            <button className="w-full flex items-center space-x-4 p-4 text-left hover:bg-gray-50/80 rounded-xl transition-all duration-300 group">
+            <button onClick={() => navigate('/client-galleries')} className="w-full flex items-center space-x-4 p-4 text-left hover:bg-gray-50/80 rounded-xl transition-all duration-300 group">
               <div className="w-12 h-12 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
                 <Users className="w-6 h-6 text-purple-600" />
               </div>
@@ -218,8 +227,7 @@ const Dashboard: React.FC = () => {
                 <p className="text-sm font-medium text-gray-600">Manage client photo galleries</p>
               </div>
             </button>
-            
-            <button className="w-full flex items-center space-x-4 p-4 text-left hover:bg-gray-50/80 rounded-xl transition-all duration-300 group">
+            <button onClick={() => navigate('/featured-work')} className="w-full flex items-center space-x-4 p-4 text-left hover:bg-gray-50/80 rounded-xl transition-all duration-300 group">
               <div className="w-12 h-12 bg-gradient-to-br from-orange-100 to-orange-200 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
                 <Image className="w-6 h-6 text-orange-600" />
               </div>

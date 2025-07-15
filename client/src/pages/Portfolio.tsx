@@ -4,46 +4,42 @@ import { Filter, Download, Heart, Star } from 'lucide-react';
 import { fetchResource } from '../api';
 
 const Portfolio: React.FC = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedPortfolioId, setSelectedPortfolioId] = useState<string | null>(null);
+  const [portfolios, setPortfolios] = useState<any[]>([]);
   const [selectedPhotos, setSelectedPhotos] = useState<string[]>([]);
-  const [photos, setPhotos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const categories = [
-    { id: 'all', name: 'All' },
-    { id: 'portrait', name: 'Portraits' },
-    { id: 'couple', name: 'Couples' },
-    { id: 'family', name: 'Family' },
-    { id: 'engagement', name: 'Engagement' },
-    { id: 'wedding', name: 'Wedding' }
-  ];
-
   useEffect(() => {
-    async function loadPhotos() {
+    async function loadPortfolios() {
       setLoading(true);
       try {
-        const portfolioData = await fetchResource('Portfolio');
-        if (portfolioData && Array.isArray(portfolioData.photos)) {
-          setPhotos(portfolioData.photos.filter((photo: any) => photo.isActive !== false));
+        const data = await fetchResource('Portfolio');
+        if (Array.isArray(data)) {
+          setPortfolios(data);
+          // Default to first visible portfolio
+          const firstVisible = data.find((p: any) => p.showOnClient !== false);
+          setSelectedPortfolioId(firstVisible ? firstVisible.id : null);
         } else {
-          setPhotos([]);
+          setPortfolios([]);
+          setSelectedPortfolioId(null);
         }
       } catch (e) {
-        setPhotos([]);
+        setPortfolios([]);
+        setSelectedPortfolioId(null);
       } finally {
         setLoading(false);
       }
     }
-    loadPhotos();
+    loadPortfolios();
   }, []);
 
-  const filteredPhotos = selectedCategory === 'all' 
-    ? photos 
-    : photos.filter(photo => photo.category === selectedCategory);
+  const visiblePortfolios = portfolios.filter((p: any) => p.showOnClient !== false);
+  const selectedPortfolio = portfolios.find((p: any) => p.id === selectedPortfolioId);
+  const photos = selectedPortfolio ? selectedPortfolio.photos.filter((photo: any) => photo.isActive !== false) : [];
 
   const togglePhotoSelection = (photoId: string) => {
-    setSelectedPhotos(prev => 
-      prev.includes(photoId) 
+    setSelectedPhotos(prev =>
+      prev.includes(photoId)
         ? prev.filter(id => id !== photoId)
         : [...prev, photoId]
     );
@@ -71,28 +67,32 @@ const Portfolio: React.FC = () => {
       <section className="section-padding bg-cream-100">
         <div className="container-custom">
           <div className="flex flex-wrap justify-center gap-4 mb-8">
-            {categories.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`px-6 py-3 rounded-full font-medium transition-all duration-300 ${
-                  selectedCategory === category.id
-                    ? 'bg-sage-600 text-white'
-                    : 'bg-sage-100 text-sage-700 hover:bg-sage-200'
-                }`}
-              >
-                {category.name}
-              </button>
-            ))}
+            {visiblePortfolios.length === 0 ? (
+              <span className="text-sage-600">No portfolios available.</span>
+            ) : (
+              visiblePortfolios.map((portfolio: any) => (
+                <button
+                  key={portfolio.id}
+                  onClick={() => setSelectedPortfolioId(portfolio.id)}
+                  className={`px-6 py-3 rounded-full font-medium transition-all duration-300 ${
+                    selectedPortfolioId === portfolio.id
+                      ? 'bg-sage-600 text-white'
+                      : 'bg-sage-100 text-sage-700 hover:bg-sage-200'
+                  }`}
+                >
+                  {portfolio.title}
+                </button>
+              ))
+            )}
           </div>
 
           {/* Photo Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {loading ? (
               <div className="col-span-full text-center text-sage-600">Loading photos...</div>
-            ) : filteredPhotos.length === 0 ? (
+            ) : !selectedPortfolio || photos.length === 0 ? (
               <div className="col-span-full text-center text-sage-600">No photos found.</div>
-            ) : filteredPhotos.map((photo, index) => (
+            ) : photos.map((photo: any, index: number) => (
               <motion.div
                 key={photo.id}
                 initial={{ opacity: 0, y: 30 }}
@@ -125,19 +125,7 @@ const Portfolio: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                <div className="p-6">
-                  <h3 className="text-lg font-semibold text-sage-800 mb-2">
-                    {photo.title}
-                  </h3>
-                  <p className="text-sage-600 capitalize">
-                    {photo.category} Photography
-                  </p>
-                  {photo.description && (
-                    <p className="text-sage-500 text-sm mt-2">
-                      {photo.description}
-                    </p>
-                  )}
-                </div>
+                {/* Remove the text below the image */}
               </motion.div>
             ))}
           </div>

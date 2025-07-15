@@ -83,19 +83,19 @@ const Footer: React.FC = () => {
               Specializing in portraits, couples, and family photography in {settings.businessInfo.location}.
             </p>
             {socialLinks.length > 0 && (
-              <div className="flex space-x-4">
+            <div className="flex space-x-4">
                 {socialLinks.map(({ platform, url, icon: Icon, color }) => (
-                  <a
+              <a
                     key={platform}
                     href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                target="_blank"
+                rel="noopener noreferrer"
                     className={`p-2 bg-sage-700 rounded-full ${color} transition-colors`}
-                  >
+              >
                     <Icon className="w-5 h-5" />
-                  </a>
+              </a>
                 ))}
-              </div>
+            </div>
             )}
           </div>
 

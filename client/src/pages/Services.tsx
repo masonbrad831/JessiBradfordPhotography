@@ -76,13 +76,13 @@ const Services: React.FC = () => {
             ) : services.map((service: any, index: number) => {
               const Icon = ICON_MAP[service.icon] || Camera;
               return (
-                <motion.div
+          <motion.div
                   key={service.id || service.name}
-                  initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: index * 0.1 }}
                   className="farmhouse-card text-center card-hover"
-                >
+          >
                   <div className="w-16 h-16 bg-wood-200 rounded-full flex items-center justify-center mx-auto mb-6 border border-wood-300">
                     <Icon className="w-8 h-8 text-wood-700" />
                   </div>
@@ -93,7 +93,7 @@ const Services: React.FC = () => {
                       <Clock className="w-5 h-5" />
                       <span className="text-base">{service.duration}</span>
                     </div>
-                    <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-2">
                       <Users className="w-5 h-5" />
                       <span className="text-base">{service.photoCount} photos</span>
                     </div>
@@ -103,10 +103,10 @@ const Services: React.FC = () => {
                     <ul className="text-left text-wood-700 text-sm mb-4 mx-auto max-w-xs list-disc list-inside">
                       {service.includes.map((inc: string, i: number) => (
                         <li key={i}>{inc}</li>
-                      ))}
-                    </ul>
+                    ))}
+                  </ul>
                   )}
-                </motion.div>
+              </motion.div>
               );
             })}
           </div>

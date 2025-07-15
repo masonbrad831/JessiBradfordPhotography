@@ -254,7 +254,7 @@ const Reviews: React.FC = () => {
               See what our clients have to say about their photography experience
             </p>
           </motion.div>
-
+          
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {reviews.length === 0 ? (
               <div className="col-span-full text-center text-wood-600 py-12">
@@ -262,9 +262,9 @@ const Reviews: React.FC = () => {
               </div>
             ) : (
               reviews.map((review, index) => (
-                <motion.div
-                  key={review.id}
-                  initial={{ opacity: 0, y: 30 }}
+              <motion.div
+                key={review.id}
+                initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: index * 0.1 }}
                   viewport={{ once: true }}
@@ -294,8 +294,8 @@ const Reviews: React.FC = () => {
                     <p className="text-xs text-wood-500 mt-1">
                       {new Date(review.date).toLocaleDateString()}
                     </p>
-                  </div>
-                </motion.div>
+                </div>
+              </motion.div>
               ))
             )}
           </div>

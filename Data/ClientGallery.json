@@ -1,0 +1,80 @@
+[
+  {
+    "id": "gallery-1",
+    "clientName": "Jane Doe",
+    "accessCode": "A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6",
+    "sessionType": "Family",
+    "photos": [
+      {
+        "id": "photo-1",
+        "imageUrl": "https://res.cloudinary.com/demo/image/upload/sample.jpg",
+        "public_id": "sample"
+      },
+      {
+        "id": "photo-2",
+        "imageUrl": "https://res.cloudinary.com/demo/image/upload/sample2.jpg",
+        "public_id": "sample2"
+      }
+    ],
+    "maxSelectable": 10,
+    "extraPhotoPrice": 15,
+    "selectedPhotoIds": [
+      "photo-1",
+      "photo-2"
+    ],
+    "locked": false,
+    "status": "active",
+    "selectionLocked": false
+  },
+  {
+    "id": "1752558073734",
+    "clientName": "John Doe",
+    "accessCode": "A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6",
+    "sessionType": "Family",
+    "photos": [
+      {
+        "id": "1752558099443t1061ajg3gl",
+        "imageUrl": "https://res.cloudinary.com/dyvi1ugqt/image/upload/v1752558095/lvnxxs8xtrigni0a5rsx.jpg",
+        "public_id": "lvnxxs8xtrigni0a5rsx"
+      },
+      {
+        "id": "1752558099443nyy55edb5f",
+        "imageUrl": "https://res.cloudinary.com/dyvi1ugqt/image/upload/v1752558096/fmcceehb9okybu9mluki.jpg",
+        "public_id": "fmcceehb9okybu9mluki"
+      },
+      {
+        "id": "1752558099443tacwiyf2tze",
+        "imageUrl": "https://res.cloudinary.com/dyvi1ugqt/image/upload/v1752558097/wpir16ncgie0otcv1jfw.jpg",
+        "public_id": "wpir16ncgie0otcv1jfw"
+      },
+      {
+        "id": "1752558099444ikf61rks2g",
+        "imageUrl": "https://res.cloudinary.com/dyvi1ugqt/image/upload/v1752558098/v5kzsprksb23jn31njom.jpg",
+        "public_id": "v5kzsprksb23jn31njom"
+      },
+      {
+        "id": "175255809944448oqufwdkln",
+        "imageUrl": "https://res.cloudinary.com/dyvi1ugqt/image/upload/v1752558098/coqevdlvspwk00ymj6cd.jpg",
+        "public_id": "coqevdlvspwk00ymj6cd"
+      },
+      {
+        "id": "175255809944421vob3shcf0h",
+        "imageUrl": "https://res.cloudinary.com/dyvi1ugqt/image/upload/v1752558099/kr8vznjrxdhoyhyngn3k.jpg",
+        "public_id": "kr8vznjrxdhoyhyngn3k"
+      }
+    ],
+    "maxSelectable": 10,
+    "extraPhotoPrice": 0,
+    "selectedPhotoIds": [
+      "175255809944421vob3shcf0h",
+      "1752558099443nyy55edb5f",
+      "1752558099443tacwiyf2tze",
+      "1752558099444ikf61rks2g",
+      "1752558099443t1061ajg3gl",
+      "175255809944448oqufwdkln"
+    ],
+    "locked": false,
+    "status": "active",
+    "selectionLocked": true
+  }
+]

@@ -120,7 +120,7 @@ const About: React.FC = () => {
               ) : (
                 <p className="text-lg text-sage-700 mb-6 whitespace-pre-line">{aboutMe || 'No About Me content set yet.'}</p>
               )}
-            </div>
+              </div>
           </div>
         </div>
       </section>
@@ -139,7 +139,7 @@ const About: React.FC = () => {
               const Icon = ICON_MAP[card.icon] || Heart;
               return (
                 <div key={idx} className="bg-cream-200 p-8 rounded-lg shadow-lg text-center card-hover">
-                  <div className="w-16 h-16 bg-sage-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div className="w-16 h-16 bg-sage-100 rounded-full flex items-center justify-center mx-auto mb-6">
                     <Icon className="w-8 h-8 text-sage-600" />
                   </div>
                   <h3 className="text-xl font-semibold text-sage-800 mb-4">{card.title}</h3>
@@ -180,23 +180,23 @@ const About: React.FC = () => {
                 <p className="text-lg text-sage-700 mb-6">Loading...</p>
               ) : (
                 <>
-                  <h2 className="text-4xl font-serif font-semibold text-sage-800 mb-6">
+              <h2 className="text-4xl font-serif font-semibold text-sage-800 mb-6">
                     {locationHeading}
-                  </h2>
-                  <p className="text-lg text-sage-700 mb-6">
+              </h2>
+              <p className="text-lg text-sage-700 mb-6">
                     {locationParagraph}
-                  </p>
-                  <div className="space-y-4">
+              </p>
+              <div className="space-y-4">
                     {(locationFeatures || []).map((feature, idx) => {
                       const Icon = LOCATION_ICON_MAP[feature.icon] || MapPin;
                       return (
                         <div key={idx} className="flex items-center space-x-3">
                           <Icon className="w-6 h-6 text-sage-600" />
                           <span className="text-sage-700">{feature.text}</span>
-                        </div>
+                </div>
                       );
                     })}
-                  </div>
+                </div>
                 </>
               )}
             </motion.div>

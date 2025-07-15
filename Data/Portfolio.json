@@ -1,58 +1,35 @@
-{
-  "photos": [
-    {
-      "id": "1",
-      "title": "Sample Portrait",
-      "imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-      "category": "portrait",
-      "isActive": true,
-      "isStarred": true,
-      "description": "A beautiful portrait session"
-    },
-    {
-      "id": "2",
-      "title": "Sample Family",
-      "imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-      "category": "family",
-      "isActive": true,
-      "isStarred": true,
-      "description": "Family photography session"
-    },
-    {
-      "id": "3",
-      "title": "Sample Couple",
-      "imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-      "category": "couple",
-      "isActive": true,
-      "isStarred": true,
-      "description": "Couple engagement session"
-    },
-    {
-      "id": "4",
-      "title": "Sample Wedding",
-      "imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-      "category": "wedding",
-      "isActive": true,
-      "isStarred": true,
-      "description": "Wedding photography"
-    },
-    {
-      "id": "5",
-      "title": "Sample Engagement",
-      "imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-      "category": "engagement",
-      "isActive": true,
-      "isStarred": true,
-      "description": "Engagement session"
-    },
-    {
-      "id": "1752538168486",
-      "title": "test",
-      "imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-      "category": "family",
-      "description": "",
-      "isActive": true,
-      "isStarred": true
-    }
-  ]
-}
+[
+  {
+    "id": "1752554849502",
+    "title": "Couples",
+    "description": "",
+    "photos": [
+      {
+        "id": "1752554897180qvdr50ty999",
+        "imageUrl": "https://res.cloudinary.com/dyvi1ugqt/image/upload/v1752554891/mtchsdcetv56xf52edyg.jpg",
+        "isStarred": true
+      },
+      {
+        "id": "17525548971814p4a76v0ae4",
+        "imageUrl": "https://res.cloudinary.com/dyvi1ugqt/image/upload/v1752554892/hzdqu3jasmwtmfp0wxhl.jpg"
+      },
+      {
+        "id": "1752554897181qdt3e2zwpf",
+        "imageUrl": "https://res.cloudinary.com/dyvi1ugqt/image/upload/v1752554893/qyciqwzt2tci91cj8n4b.jpg"
+      },
+      {
+        "id": "17525548971816suf8aik6rf",
+        "imageUrl": "https://res.cloudinary.com/dyvi1ugqt/image/upload/v1752554894/xqqqwilz5vgzuczcwtq2.jpg"
+      },
+      {
+        "id": "1752554897181klb9tgsr0ta",
+        "imageUrl": "https://res.cloudinary.com/dyvi1ugqt/image/upload/v1752554895/cdzkacrw6wckt1qrdrsv.jpg"
+      },
+      {
+        "id": "17525548971817tqkxwn47w7",
+        "imageUrl": "https://res.cloudinary.com/dyvi1ugqt/image/upload/v1752554896/x4hesb8sdbqas0agq9s6.jpg"
+      }
+    ],
+    "showOnClient": true
+  }
+]

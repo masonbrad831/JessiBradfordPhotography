@@ -1,11 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Image, Plus, Trash2, Edit, Eye, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { fetchResource, saveResource } from '../api';
 
+const CLOUD_NAME = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME || '';
+const UPLOAD_PRESET = process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET || '';
+const CLOUDINARY_API_KEY = process.env.REACT_APP_CLOUDINARY_API_KEY || '';
+declare global {
+  interface Window {
+    cloudinary: any;
+  }
+}
+
+type FeaturedWorkType = Array<any> | { items: Array<any>; sectionDescription?: string };
 const FeaturedWorkManager: React.FC = () => {
-  const [featuredWork, setFeaturedWork] = useState<any[]>([]);
+  const [featuredWork, setFeaturedWork] = useState<FeaturedWorkType>([]);
   const [sectionDescription, setSectionDescription] = useState<string>("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingWork, setEditingWork] = useState<any>(null);
@@ -16,6 +26,10 @@ const FeaturedWorkManager: React.FC = () => {
     order: 1
   });
   const [loading, setLoading] = useState(true);
+  const [multiImages, setMultiImages] = useState<any[]>([]); // {file, uploading, url, public_id, progress}
+  const [cloudinaryReady, setCloudinaryReady] = useState(false);
+  const [selectingFromCloudinary, setSelectingFromCloudinary] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     async function loadFeaturedWork() {
@@ -23,7 +37,7 @@ const FeaturedWorkManager: React.FC = () => {
       try {
         const workData = await fetchResource('FeaturedWork');
         if (workData && typeof workData === 'object' && Array.isArray(workData.items)) {
-          setFeaturedWork(workData.items);
+          setFeaturedWork(workData);
           setSectionDescription(workData.sectionDescription || "");
         } else if (Array.isArray(workData)) {
           setFeaturedWork(workData);
@@ -40,63 +54,46 @@ const FeaturedWorkManager: React.FC = () => {
       }
     }
     loadFeaturedWork();
+
+    // Dynamically load Cloudinary Media Library Widget if not present
+    if (!window.cloudinary) {
+      const script = document.createElement('script');
+      script.src = 'https://media-library.cloudinary.com/global/all.js';
+      script.async = true;
+      script.onload = () => setCloudinaryReady(true);
+      script.onerror = () => toast.error('Failed to load Cloudinary Media Library Widget');
+      document.body.appendChild(script);
+    } else {
+      setCloudinaryReady(true);
+    }
   }, []);
 
-  const categories = [
-    'family',
-    'couple',
-    'portrait',
-    'engagement',
-    'wedding',
-    'event'
-  ];
-
-  const handleAddWork = async () => {
-    if (!newWork.title || !newWork.imageUrl || !newWork.category) {
-      toast.error('Please fill in all fields');
-      return;
-    }
-    try {
-      const work = {
-        id: Date.now().toString(),
-        ...newWork,
-        isActive: true,
-        order: featuredWork.length + 1
-      };
-      const updatedWork = [...featuredWork, work];
-      await saveResource('FeaturedWork', { sectionDescription, items: updatedWork });
-      setFeaturedWork(updatedWork);
-      setNewWork({ title: '', imageUrl: '', category: '', order: updatedWork.length + 1 });
-      setShowAddModal(false);
-      toast.success('Featured work added');
-    } catch (e) {
-      toast.error('Failed to add featured work');
-    }
-  };
-
-  const handleEditWork = async () => {
-    if (!editingWork.title || !editingWork.imageUrl || !editingWork.category) {
-      toast.error('Please fill in all fields');
-      return;
-    }
-    try {
-      const updatedWork = featuredWork.map(work =>
-        work.id === editingWork.id ? editingWork : work
-      );
-      await saveResource('FeaturedWork', updatedWork);
-      setFeaturedWork(updatedWork);
-      setEditingWork(null);
-      toast.success('Featured work updated');
-    } catch (e) {
-      toast.error('Failed to update featured work');
-    }
-  };
+  // Remove unused newWork state and categories array
+  // Remove handleAddWork and handleEditWork functions
 
   const handleDeleteWork = async (id: string) => {
     try {
-      const updatedWork = featuredWork.filter(work => work.id !== id);
+      // Find the imageUrl of the work being deleted
+      const work = workItems.find(w => w.id === id);
+      const imageUrl = work?.imageUrl;
+      const updatedWork = workItems.filter(work => work.id !== id);
       await saveResource('FeaturedWork', updatedWork);
       setFeaturedWork(updatedWork);
+      // Unstar in all portfolios
+      if (imageUrl) {
+        const allPortfolios = await fetchResource('Portfolio');
+        if (Array.isArray(allPortfolios)) {
+          const updatedPortfolios = allPortfolios.map((p: any) => ({
+            ...p,
+            photos: Array.isArray(p.photos)
+              ? p.photos.map((photo: any) =>
+                  photo.imageUrl === imageUrl ? { ...photo, isStarred: false } : photo
+                )
+              : [],
+          }));
+          await saveResource('Portfolio', updatedPortfolios);
+        }
+      }
       toast.success('Featured work removed');
     } catch (e) {
       toast.error('Failed to remove featured work');
@@ -105,7 +102,7 @@ const FeaturedWorkManager: React.FC = () => {
 
   const handleToggleActive = async (id: string) => {
     try {
-      const updatedWork = featuredWork.map(work =>
+      const updatedWork = workItems.map(work =>
         work.id === id ? { ...work, isActive: !work.isActive } : work
       );
       await saveResource('FeaturedWork', updatedWork);
@@ -116,9 +113,9 @@ const FeaturedWorkManager: React.FC = () => {
   };
 
   const handleReorder = async (id: string, direction: 'up' | 'down') => {
-    const currentIndex = featuredWork.findIndex(work => work.id === id);
+    const currentIndex = workItems.findIndex(work => work.id === id);
     if (currentIndex === -1) return;
-    const newWorkArr = [...featuredWork];
+    const newWorkArr = [...workItems];
     if (direction === 'up' && currentIndex > 0) {
       [newWorkArr[currentIndex], newWorkArr[currentIndex - 1]] = 
       [newWorkArr[currentIndex - 1], newWorkArr[currentIndex]];
@@ -136,6 +133,106 @@ const FeaturedWorkManager: React.FC = () => {
     }
   };
 
+  // Multi-image upload handler with progress
+  const handleFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    setMultiImages(files.map(file => ({ file, uploading: true, url: '', public_id: '', progress: 0 })));
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', UPLOAD_PRESET);
+      await new Promise<void>((resolve) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`);
+        xhr.upload.onprogress = (event) => {
+          if (event.lengthComputable) {
+            const percent = Math.round((event.loaded / event.total) * 100);
+            setMultiImages(prev => prev.map((img, idx) => idx === i ? { ...img, progress: percent } : img));
+          }
+        };
+        xhr.onload = () => {
+          const data = JSON.parse(xhr.responseText);
+          setMultiImages(prev => prev.map((img, idx) => idx === i ? { ...img, uploading: false, url: data.secure_url, public_id: data.public_id, progress: 100 } : img));
+          resolve();
+        };
+        xhr.onerror = () => {
+          setMultiImages(prev => prev.map((img, idx) => idx === i ? { ...img, uploading: false, progress: 0 } : img));
+          resolve();
+        };
+        xhr.send(formData);
+      });
+    }
+  };
+
+  // Cloudinary Media Library Widget integration
+  const openCloudinaryMediaLibrary = () => {
+    if (!window.cloudinary) {
+      toast.error('Cloudinary Media Library Widget not loaded yet. Please try again in a moment.');
+      return;
+    }
+    setSelectingFromCloudinary(true);
+    const ml = window.cloudinary.createMediaLibrary(
+      {
+        cloud_name: CLOUD_NAME,
+        api_key: CLOUDINARY_API_KEY,
+        multiple: true,
+        max_files: 20,
+        insert_caption: 'Select',
+      },
+      {
+        insertHandler: (data: any) => {
+          setMultiImages(prev => [
+            ...prev,
+            ...data.assets.map((asset: any) => ({
+              file: null,
+              uploading: false,
+              url: asset.secure_url,
+              public_id: asset.public_id,
+              progress: 100,
+            }))
+          ]);
+          setSelectingFromCloudinary(false);
+        },
+      }
+    );
+    ml.show();
+  };
+
+  // Add all uploaded/selected images to featured work
+  const handleAddMultiPhotos = async () => {
+    const validImages = multiImages.filter(img => img.url);
+    if (validImages.length === 0) {
+      toast.error('Please upload or select at least one image');
+      return;
+    }
+    const newWorks = validImages.map(img => ({
+      id: Date.now().toString() + Math.random().toString(36).slice(2),
+      imageUrl: img.url,
+      isActive: true,
+      order: workItems.length + 1,
+    }));
+    let updatedWork: any[] = [...workItems, ...newWorks];
+    try {
+      if (sectionDescription) {
+        await saveResource('FeaturedWork', { sectionDescription, items: updatedWork });
+        setFeaturedWork({ sectionDescription, items: updatedWork });
+      } else {
+        await saveResource('FeaturedWork', updatedWork);
+        setFeaturedWork(updatedWork);
+      }
+      setShowAddModal(false);
+      setMultiImages([]);
+      toast.success('Images added to featured work');
+    } catch (e) {
+      toast.error('Failed to add images');
+    }
+  };
+
+  // Helper to always get the items array
+  const workItems = Array.isArray(featuredWork) ? featuredWork : featuredWork.items || [];
+
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
@@ -151,7 +248,7 @@ const FeaturedWorkManager: React.FC = () => {
           className="btn-primary"
           onClick={async () => {
             try {
-              await saveResource('FeaturedWork', { sectionDescription, items: featuredWork });
+              await saveResource('FeaturedWork', { sectionDescription, items: workItems });
               toast.success('Section description updated!');
             } catch {
               toast.error('Failed to update section description');
@@ -181,10 +278,10 @@ const FeaturedWorkManager: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {loading ? (
           <p>Loading featured work...</p>
-        ) : featuredWork.length === 0 ? (
+        ) : workItems.length === 0 ? (
           <p>No featured work added yet. Add some to display on the homepage!</p>
         ) : (
-          featuredWork.map((work, index) => (
+          workItems.map((work, index) => (
             <motion.div
               key={work.id}
               initial={{ opacity: 0, y: 20 }}
@@ -245,7 +342,7 @@ const FeaturedWorkManager: React.FC = () => {
                     </button>
                     <button
                       onClick={() => handleReorder(work.id, 'down')}
-                      disabled={index === featuredWork.length - 1}
+                      disabled={index === workItems.length - 1}
                       className="text-xs text-gray-400 hover:text-gray-600 disabled:opacity-50"
                     >
                       ↓
@@ -260,137 +357,96 @@ const FeaturedWorkManager: React.FC = () => {
 
       {/* Add/Edit Modal */}
       <AnimatePresence>
-        {(showAddModal || editingWork) && (
+        {showAddModal && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-            onClick={() => {
-              setShowAddModal(false);
-              setEditingWork(null);
-            }}
+            onClick={() => { setShowAddModal(false); setMultiImages([]); }}
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto"
+              onClick={e => e.stopPropagation()}
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto border border-gray-200"
             >
-              <div className="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
-                <h2 className="text-xl font-semibold text-gray-900">
-                  {editingWork ? 'Edit Featured Work' : 'Add Featured Work'}
+              <div className="flex items-center justify-between p-6 border-b border-gray-100 sticky top-0 bg-white z-10 rounded-t-2xl">
+                <h2 className="text-2xl font-bold text-sage-700 flex items-center gap-2">
+                  <Plus className="w-6 h-6" /> Add Featured Work Image(s)
                 </h2>
                 <button
-                  onClick={() => {
-                    setShowAddModal(false);
-                    setEditingWork(null);
-                  }}
-                  className="text-gray-400 hover:text-gray-600"
+                  onClick={() => { setShowAddModal(false); setMultiImages([]); }}
+                  className="text-gray-400 hover:text-gray-600 rounded-full p-2 transition"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-6 h-6" />
                 </button>
               </div>
-
-              <div className="p-6 space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Title
-                  </label>
-                  <input
-                    type="text"
-                    value={editingWork?.title || newWork.title}
-                    onChange={(e) => {
-                      if (editingWork) {
-                        setEditingWork({ ...editingWork, title: e.target.value });
-                      } else {
-                        setNewWork({ ...newWork, title: e.target.value });
-                      }
-                    }}
-                    className="input-field"
-                    placeholder="Enter work title"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Image URL
-                  </label>
-                  <input
-                    type="url"
-                    value={editingWork?.imageUrl || newWork.imageUrl}
-                    onChange={(e) => {
-                      if (editingWork) {
-                        setEditingWork({ ...editingWork, imageUrl: e.target.value });
-                      } else {
-                        setNewWork({ ...newWork, imageUrl: e.target.value });
-                      }
-                    }}
-                    className="input-field"
-                    placeholder="Enter image URL"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Category
-                  </label>
-                  <select
-                    value={editingWork?.category || newWork.category}
-                    onChange={(e) => {
-                      if (editingWork) {
-                        setEditingWork({ ...editingWork, category: e.target.value });
-                      } else {
-                        setNewWork({ ...newWork, category: e.target.value });
-                      }
-                    }}
-                    className="input-field"
-                  >
-                    <option value="">Select category</option>
-                    {categories.map(category => (
-                      <option key={category} value={category}>
-                        {category.charAt(0).toUpperCase() + category.slice(1)}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Display Order
-                  </label>
-                  <input
-                    type="number"
-                    value={editingWork?.order || newWork.order}
-                    onChange={(e) => {
-                      if (editingWork) {
-                        setEditingWork({ ...editingWork, order: parseInt(e.target.value) });
-                      } else {
-                        setNewWork({ ...newWork, order: parseInt(e.target.value) });
-                      }
-                    }}
-                    className="input-field"
-                    min="1"
-                  />
-                </div>
-
-                <div className="flex space-x-3 pt-4 sticky bottom-0 bg-white border-t border-gray-200 -mx-6 px-6 py-4">
+              <div className="p-8 space-y-6">
+                <div className="flex flex-col md:flex-row gap-4">
                   <button
                     type="button"
-                    onClick={() => {
-                      setShowAddModal(false);
-                      setEditingWork(null);
-                    }}
-                    className="flex-1 btn-secondary"
+                    className="btn-primary flex-1"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    Upload Images
+                  </button>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    ref={fileInputRef}
+                    style={{ display: 'none' }}
+                    onChange={handleFiles}
+                  />
+                  <button
+                    type="button"
+                    className="btn-secondary flex-1"
+                    onClick={openCloudinaryMediaLibrary}
+                    disabled={!cloudinaryReady || selectingFromCloudinary}
+                  >
+                    Select from Cloudinary
+                  </button>
+                </div>
+                {multiImages.length > 0 && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                    {multiImages.map((img, idx) => (
+                      <div key={idx} className="bg-gray-50 rounded-xl shadow-md border border-gray-200 flex flex-col md:flex-row gap-4 p-4 items-center">
+                        <div className="w-32 h-32 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center border border-gray-200">
+                          {img.uploading ? (
+                            <div className="w-full h-full flex flex-col items-center justify-center">
+                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sage-600 mb-2"></div>
+                              <div className="w-24 bg-gray-200 rounded-full h-2 overflow-hidden">
+                                <div className="bg-sage-500 h-2 rounded-full transition-all duration-300" style={{ width: `${img.progress || 0}%` }}></div>
+                              </div>
+                              <span className="text-xs text-gray-500 mt-1">{img.progress || 0}%</span>
+                            </div>
+                          ) : img.url ? (
+                            <img src={img.url} alt="preview" className="w-full h-full object-cover" />
+                          ) : (
+                            <span className="text-gray-400">No Image</span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div className="flex space-x-3 pt-4 sticky bottom-0 bg-white border-t border-gray-100 -mx-8 px-8 py-6 rounded-b-2xl">
+                  <button
+                    type="button"
+                    onClick={() => { setShowAddModal(false); setMultiImages([]); }}
+                    className="flex-1 btn-secondary text-lg"
                   >
                     Cancel
                   </button>
                   <button
-                    onClick={editingWork ? handleEditWork : handleAddWork}
-                    className="flex-1 btn-primary"
+                    type="button"
+                    onClick={handleAddMultiPhotos}
+                    className="flex-1 btn-primary text-lg"
+                    disabled={multiImages.length === 0 || multiImages.some(img => img.uploading)}
                   >
-                    {editingWork ? 'Update Work' : 'Add Work'}
+                    <Plus className="w-5 h-5 mr-2" /> Add
                   </button>
                 </div>
               </div>

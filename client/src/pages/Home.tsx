@@ -238,12 +238,12 @@ const Home: React.FC = () => {
         {/* Centered main image */}
         <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
           {heroImages.length > 0 && (
-            <img
-              src={heroImages[currentHero]}
-              alt="Slideshow hero"
-              className="max-w-3xl w-full h-auto rounded-lg shadow-xl object-contain"
-              style={{ maxHeight: '80vh' }}
-            />
+          <img
+            src={heroImages[currentHero]}
+            alt="Slideshow hero"
+            className="max-w-3xl w-full h-auto rounded-lg shadow-xl object-contain"
+            style={{ maxHeight: '80vh' }}
+          />
           )}
         </div>
         {/* Gradient overlay */}
@@ -372,13 +372,13 @@ const Home: React.FC = () => {
                       }}
                     >
                       <motion.div
-                        className="group cursor-pointer"
+                className="group cursor-pointer"
                         whileHover={{ scale: 1.02 }}
                         transition={{ duration: 0.3 }}
                         style={{
                           transformStyle: "preserve-3d"
                         }}
-                      >
+              >
                         <motion.div 
                           className="aspect-[1/1] bg-wood-200 rounded-lg overflow-hidden mb-4 rustic-border max-w-xs"
                           style={{
@@ -386,8 +386,8 @@ const Home: React.FC = () => {
                           }}
                         >
                           <motion.img
-                            src={photo.imageUrl}
-                            alt={photo.title}
+                    src={photo.imageUrl}
+                    alt={photo.title}
                             className="w-full h-full object-cover"
                             initial={{ scale: 1.1 }}
                             animate={{ scale: 1 }}
@@ -395,7 +395,7 @@ const Home: React.FC = () => {
                               duration: 1,
                               ease: "easeInOut"
                             }}
-                          />
+                  />
                         </motion.div>
 
                       </motion.div>
@@ -416,7 +416,7 @@ const Home: React.FC = () => {
                   Drag to navigate
                 </motion.div>
               )}
-            </div>
+          </div>
           )}
 
           <div className="text-center mt-12">
@@ -451,24 +451,24 @@ const Home: React.FC = () => {
             ) : services.map((service: any, index: number) => {
               const Icon = ICON_MAP[service.icon] || Camera;
               return (
-                <motion.div
+              <motion.div
                   key={service.id || service.name}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: index * 0.2 }}
-                  viewport={{ once: true }}
-                  className="farmhouse-card text-center card-hover"
-                >
-                  <div className="w-16 h-16 bg-wood-200 rounded-full flex items-center justify-center mx-auto mb-6 border border-wood-300">
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: index * 0.2 }}
+                viewport={{ once: true }}
+                className="farmhouse-card text-center card-hover"
+              >
+                <div className="w-16 h-16 bg-wood-200 rounded-full flex items-center justify-center mx-auto mb-6 border border-wood-300">
                     <Icon className="w-8 h-8 text-wood-700" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-wood-800 mb-4">
+                </div>
+                <h3 className="text-xl font-semibold text-wood-800 mb-4">
                     {service.name}
-                  </h3>
-                  <p className="text-wood-600">
-                    {service.description}
-                  </p>
-                </motion.div>
+                </h3>
+                <p className="text-wood-600">
+                  {service.description}
+                </p>
+              </motion.div>
               );
             })}
           </div>
@@ -540,7 +540,7 @@ const Home: React.FC = () => {
                         style={{
                           transformStyle: "preserve-3d"
                         }}
-                      >
+              >
                         <div className="flex items-center gap-2 mb-4">
                           <div className="flex">
                             {[...Array(5)].map((_, i) => (
@@ -550,8 +550,8 @@ const Home: React.FC = () => {
                                   i < review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
                                 }`}
                               />
-                            ))}
-                          </div>
+                  ))}
+                </div>
                           <span className="text-sm text-wood-600">({review.rating}/5)</span>
                         </div>
                         
@@ -584,7 +584,7 @@ const Home: React.FC = () => {
             <div className="text-center text-wood-600 py-12">
               <p className="text-lg mb-4">No featured reviews yet.</p>
               <p className="text-sm">Check back soon for client testimonials!</p>
-            </div>
+          </div>
           )}
 
           <div className="text-center mt-12">

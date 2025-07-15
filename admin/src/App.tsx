@@ -5,6 +5,7 @@ import AdminLayout from './components/layout/AdminLayout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import PortfolioManager from './pages/PortfolioManager';
+import PortfolioDetails from './pages/PortfolioDetails';
 import BookingManager from './pages/BookingManager';
 import ClientGalleryManager from './pages/ClientGalleryManager';
 import Settings from './pages/Settings';
@@ -39,6 +40,7 @@ function App() {
             }>
               <Route index element={<Dashboard />} />
               <Route path="portfolio-manager" element={<PortfolioManager />} />
+              <Route path="portfolio-manager/:id" element={<PortfolioDetails />} />
               <Route path="bookings" element={<BookingManager />} />
               <Route path="client-galleries" element={<ClientGalleryManager />} />
               <Route path="slideshow" element={<SlideshowManager />} />

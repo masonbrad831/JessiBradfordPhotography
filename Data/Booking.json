@@ -47,7 +47,7 @@
     "notes": "",
     "date": "2025-07-26",
     "time": "7:00 PM",
-    "status": "pending",
+    "status": "declined",
     "promotionCode": "ALL50OFF"
   },
   {
@@ -59,6 +59,56 @@
     "time": "11:00 AM",
     "notes": "test",
     "id": "1752532096679",
+    "status": "declined"
+  },
+  {
+    "id": "1752552474406",
+    "clientName": "Mason Bradford",
+    "email": "masonbrad831@gmail.com",
+    "phone": "4352890160",
+    "service": "Portrait Session",
+    "location": "test",
+    "notes": "",
+    "date": "2025-07-14",
+    "time": "5:30 PM",
+    "status": "declined"
+  },
+  {
+    "id": "1752552696872",
+    "clientName": "Mason Bradford",
+    "email": "masonbrad831@gmail.com",
+    "phone": "4352890160",
+    "service": "Couple Session",
+    "location": "test",
+    "notes": "",
+    "date": "2025-07-14",
+    "time": "5:30 PM",
+    "status": "declined",
+    "promotionCode": "50OFF"
+  },
+  {
+    "id": "1752553456208",
+    "clientName": "Mason Bradford",
+    "email": "masonbrad831@gmail.com",
+    "phone": "4352890160",
+    "service": "Portrait Session",
+    "location": "test",
+    "notes": "",
+    "date": "2025-07-14",
+    "time": "7:00 PM",
     "status": "pending"
+  },
+  {
+    "id": "1752555392572",
+    "clientName": "Mason Bradford",
+    "email": "masonbrad831@gmail.com",
+    "phone": "4352890160",
+    "service": "Mini Sessions",
+    "location": "test",
+    "notes": "",
+    "date": "2025-07-15",
+    "time": "5:30 PM",
+    "status": "pending",
+    "promotionCode": "BABIES"
   }
 ]

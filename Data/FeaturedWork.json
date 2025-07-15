@@ -1,51 +1,39 @@
 {
-  "sectionDescription": "A glimpse into my artistic vision and the beautiful moments I've captured",
+  "sectionDescription": "A glimpse into my artistic vision and the beautiful moments I've captured ",
   "items": [
     {
-      "id": "1752538168486",
-      "title": "test",
-      "imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-      "category": "family",
+      "id": "1752550106800h5s20qwd6ir",
+      "imageUrl": "https://res.cloudinary.com/dyvi1ugqt/image/upload/v1752546889/samples/animals/reindeer.jpg",
       "isActive": true,
       "order": 1
     },
     {
-      "id": "5",
-      "title": "Sample Engagement",
-      "imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-      "category": "engagement",
+      "id": "1752550106800gy9e743dtun",
+      "imageUrl": "https://res.cloudinary.com/dyvi1ugqt/image/upload/v1752546889/samples/ecommerce/analog-classic.jpg",
       "isActive": true,
-      "order": 2
+      "order": 1
     },
     {
-      "id": "4",
-      "title": "Sample Wedding",
-      "imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-      "category": "wedding",
+      "id": "1752550106800pktlqh46brs",
+      "imageUrl": "https://res.cloudinary.com/dyvi1ugqt/image/upload/v1752546889/samples/food/fish-vegetables.jpg",
       "isActive": true,
-      "order": 3
+      "order": 1
     },
     {
-      "id": "1",
-      "title": "Sample Portrait",
-      "imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-      "category": "portrait",
+      "id": "1752550507573u733quy6vu",
+      "imageUrl": "https://res.cloudinary.com/dyvi1ugqt/image/upload/v1752550507/qdrdepd6ewruwyq8xvap.jpg",
       "isActive": true,
       "order": 4
     },
     {
-      "id": "2",
-      "title": "Sample Family",
-      "imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-      "category": "family",
+      "id": "17525494778300i5a7s8xirkj",
+      "imageUrl": "https://res.cloudinary.com/dyvi1ugqt/image/upload/v1752548553/qfsspwdqsk1gofaz9e2h.jpg",
       "isActive": true,
-      "order": 5
+      "order": 6
     },
     {
-      "id": "3",
-      "title": "Sample Couple",
-      "imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-      "category": "couple",
+      "id": "1752554897180qvdr50ty999",
+      "imageUrl": "https://res.cloudinary.com/dyvi1ugqt/image/upload/v1752554891/mtchsdcetv56xf52edyg.jpg",
       "isActive": true,
       "order": 6
     }

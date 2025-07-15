@@ -1,1 +1,30 @@
-[]
+[
+  {
+    "id": "1752552666744",
+    "code": "50OFF",
+    "description": "test",
+    "usageLimit": 1,
+    "allowedSessionTypes": [
+      "Couple Session"
+    ],
+    "discountType": "percent",
+    "discountValue": 22,
+    "usedBy": [
+      "masonbrad831@gmail.com"
+    ]
+  },
+  {
+    "id": "1752555356013",
+    "code": "BABIES",
+    "description": "newborn minis",
+    "usageLimit": 10,
+    "allowedSessionTypes": [
+      "Mini Sessions"
+    ],
+    "discountType": "fixed",
+    "discountValue": 50,
+    "usedBy": [
+      "masonbrad831@gmail.com"
+    ]
+  }
+]

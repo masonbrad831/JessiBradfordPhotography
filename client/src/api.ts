@@ -1,4 +1,4 @@
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
+const API_URL = process.env.REACT_APP_API_BASE_URL;
 
 export async function fetchResource(resource: string) {
   const res = await fetch(`${API_URL}/${resource}`);

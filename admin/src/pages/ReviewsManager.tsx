@@ -128,10 +128,10 @@ const ReviewsManager: React.FC = () => {
 
       <div className="grid gap-4">
         {getFilteredReviews().map((review) => (
-          <motion.div
-            key={review.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            <motion.div
+              key={review.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
             className="bg-white rounded-lg shadow-md p-6 border border-wood-200"
           >
             <div className="flex justify-between items-start mb-4">
@@ -170,31 +170,31 @@ const ReviewsManager: React.FC = () => {
                 >
                   {review.isApproved ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
                 </button>
-                <button
+                  <button
                   onClick={() => handleToggleFeatured(review)}
-                  className={`p-2 rounded-lg transition-colors ${
-                    review.isFeatured
+                    className={`p-2 rounded-lg transition-colors ${
+                      review.isFeatured 
                       ? 'bg-blue-100 text-blue-600 hover:bg-blue-200'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
+                    }`}
                   title={review.isFeatured ? 'Unfeature' : 'Feature'}
-                >
+                  >
                   {review.isFeatured ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                </button>
-                <button
+                  </button>
+                  <button
                   onClick={() => handleToggleActive(review)}
-                  className={`p-2 rounded-lg transition-colors ${
-                    review.isActive
+                    className={`p-2 rounded-lg transition-colors ${
+                      review.isActive 
                       ? 'bg-green-100 text-green-600 hover:bg-green-200'
                       : 'bg-red-100 text-red-600 hover:bg-red-200'
-                  }`}
-                  title={review.isActive ? 'Deactivate' : 'Activate'}
-                >
+                    }`}
+                    title={review.isActive ? 'Deactivate' : 'Activate'}
+                  >
                   {review.isActive ? <ThumbsUp className="w-4 h-4" /> : <ThumbsDown className="w-4 h-4" />}
-                </button>
+                  </button>
+                </div>
               </div>
-            </div>
-            
+              
             <p className="text-wood-700 mb-4">{review.comment}</p>
             
             <div className="flex items-center gap-4 text-sm">
@@ -204,16 +204,16 @@ const ReviewsManager: React.FC = () => {
               <span className="text-wood-500">
                 Order: {review.order}
               </span>
-            </div>
-          </motion.div>
-        ))}
-      </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
 
       {getFilteredReviews().length === 0 && (
         <div className="text-center py-12 text-wood-600">
           No reviews found for the selected filter.
-        </div>
-      )}
+              </div>
+        )}
     </div>
   );
 };

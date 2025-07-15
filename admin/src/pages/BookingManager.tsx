@@ -19,6 +19,8 @@ const BookingManager: React.FC = () => {
   const [bookings, setBookings] = useState<any[]>([]);
   const [services, setServices] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [sortBy, setSortBy] = useState<'created' | 'appointment'>('created');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'confirmed' | 'pending' | 'declined' | 'done'>('all');
 
   const timeSlots = [
     '9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM',
@@ -68,6 +70,30 @@ const BookingManager: React.FC = () => {
         return 'bg-gray-100 text-gray-800';
     }
   };
+
+  // Helper to determine if a booking is done (appointment date in the past)
+  const isDone = (booking: any) => {
+    const today = new Date();
+    const apptDate = new Date(booking.date + 'T' + (booking.time || '00:00'));
+    return apptDate < today;
+  };
+
+  // Sort and filter bookings
+  let displayedBookings = [...bookings];
+  if (statusFilter !== 'all') {
+    if (statusFilter === 'done') {
+      displayedBookings = displayedBookings.filter(b => isDone(b));
+    } else if (statusFilter === 'declined') {
+      displayedBookings = displayedBookings.filter(b => b.status === 'declined' || b.status === 'cancelled');
+    } else {
+      displayedBookings = displayedBookings.filter(b => b.status === statusFilter);
+    }
+  }
+  if (sortBy === 'created') {
+    displayedBookings.sort((a, b) => Number(b.id) - Number(a.id));
+  } else if (sortBy === 'appointment') {
+    displayedBookings.sort((a, b) => new Date(b.date + 'T' + (b.time || '00:00')).getTime() - new Date(a.date + 'T' + (a.time || '00:00')).getTime());
+  }
 
   const handleNewBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -173,6 +199,24 @@ const BookingManager: React.FC = () => {
         </motion.div>
       )}
 
+      {/* Sorting and Filtering Controls */}
+      <div className="flex flex-wrap items-center gap-4 px-6 py-4 border-b border-gray-200 bg-gray-50">
+        <div className="flex gap-2">
+          <button onClick={() => setStatusFilter('all')} className={`px-3 py-1 rounded-full text-sm font-medium ${statusFilter === 'all' ? 'bg-sage-600 text-white' : 'bg-sage-100 text-sage-700 hover:bg-sage-200'}`}>All</button>
+          <button onClick={() => setStatusFilter('confirmed')} className={`px-3 py-1 rounded-full text-sm font-medium ${statusFilter === 'confirmed' ? 'bg-sage-600 text-white' : 'bg-sage-100 text-sage-700 hover:bg-sage-200'}`}>Accepted</button>
+          <button onClick={() => setStatusFilter('pending')} className={`px-3 py-1 rounded-full text-sm font-medium ${statusFilter === 'pending' ? 'bg-sage-600 text-white' : 'bg-sage-100 text-sage-700 hover:bg-sage-200'}`}>Pending</button>
+          <button onClick={() => setStatusFilter('done')} className={`px-3 py-1 rounded-full text-sm font-medium ${statusFilter === 'done' ? 'bg-sage-600 text-white' : 'bg-sage-100 text-sage-700 hover:bg-sage-200'}`}>Done</button>
+          <button onClick={() => setStatusFilter('declined')} className={`px-3 py-1 rounded-full text-sm font-medium ${statusFilter === 'declined' ? 'bg-sage-600 text-white' : 'bg-sage-100 text-sage-700 hover:bg-sage-200'}`}>Declined</button>
+        </div>
+        <div className="flex gap-2 ml-auto">
+          <label className="text-sm font-medium text-gray-700">Sort by:</label>
+          <select value={sortBy} onChange={e => setSortBy(e.target.value as any)} className="input-field text-sm py-1 px-2">
+            <option value="created">Booking Time (Newest)</option>
+            <option value="appointment">Appointment Date</option>
+          </select>
+        </div>
+      </div>
+
       {/* Bookings List */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="px-6 py-4 border-b border-gray-200">
@@ -181,10 +225,10 @@ const BookingManager: React.FC = () => {
         <div className="divide-y divide-gray-200">
           {loading ? (
             <div className="p-6 text-center text-gray-500">Loading bookings...</div>
-          ) : bookings.length === 0 ? (
+          ) : displayedBookings.length === 0 ? (
             <div className="p-6 text-center text-gray-500">No bookings found.</div>
           ) : (
-            bookings.map((booking, index) => (
+            displayedBookings.map((booking, index) => (
               <motion.div
                 key={booking.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -239,7 +283,22 @@ const BookingManager: React.FC = () => {
                   <button className="btn-secondary text-sm py-1 px-3">
                     Suggest Alternative
                   </button>
-                  <button className="text-red-600 hover:text-red-800 text-sm py-1 px-3">
+                  <button
+                    className="text-red-600 hover:text-red-800 text-sm py-1 px-3"
+                    onClick={async () => {
+                      const updatedBookings = bookings.map(b =>
+                        b.id === booking.id ? { ...b, status: 'declined' } : b
+                      );
+                      setBookings(updatedBookings);
+                      try {
+                        await saveResource('Booking', updatedBookings);
+                        toast.success('Booking declined!');
+                      } catch (e) {
+                        toast.error('Failed to decline booking');
+                      }
+                    }}
+                    disabled={booking.status === 'declined' || booking.status === 'cancelled'}
+                  >
                     Decline
                   </button>
                   <button className="flex items-center space-x-1 text-gray-600 hover:text-gray-800 text-sm py-1 px-3">

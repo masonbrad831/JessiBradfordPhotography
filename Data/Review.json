@@ -37,7 +37,7 @@
     "serviceType": "Couple Session",
     "date": "2025-07-16",
     "isActive": true,
-    "isFeatured": true,
+    "isFeatured": false,
     "isApproved": true,
     "order": 3
   },
@@ -64,8 +64,8 @@
     "comment": "Not what I expected.",
     "serviceType": "Event Photography",
     "date": "2025-07-18",
-    "isActive": true,
-    "isFeatured": false,
+    "isActive": false,
+    "isFeatured": true,
     "isApproved": true,
     "order": 5
   }
