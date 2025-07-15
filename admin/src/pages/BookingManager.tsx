@@ -268,9 +268,9 @@ const BookingManager: React.FC = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-lg shadow-xl w-full max-w-md"
+              className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto"
             >
-              <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
                 <h2 className="text-xl font-semibold text-gray-900">New Booking</h2>
                 <button
                   onClick={() => setShowNewBookingModal(false)}
@@ -280,7 +280,13 @@ const BookingManager: React.FC = () => {
                 </button>
               </div>
 
-              <form onSubmit={handleNewBookingSubmit} className="p-6 space-y-4">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleNewBookingSubmit(e);
+                }}
+                className="p-6 space-y-4"
+              >
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Client Name *
@@ -384,7 +390,7 @@ const BookingManager: React.FC = () => {
                   />
                 </div>
 
-                <div className="flex space-x-3 pt-4">
+                <div className="flex space-x-3 pt-4 sticky bottom-0 bg-white border-t border-gray-200 -mx-6 px-6 py-4">
                   <button
                     type="button"
                     onClick={() => setShowNewBookingModal(false)}

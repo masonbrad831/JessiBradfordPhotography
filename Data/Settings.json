@@ -1,0 +1,45 @@
+{
+  "businessInfo": {
+    "businessName": "Jessi Bradford Photography",
+    "email": "jessi@jessibradfordphotography.com",
+    "phone": "(555) 123-4567",
+    "location": "Salina, Utah",
+    "address": "",
+    "website": "https://jessibradfordphotography.com"
+  },
+  "socialMedia": {
+    "facebook": "https://facebook.com/jessibradfordphotography",
+    "instagram": "https://instagram.com/jessibradfordphotography",
+    "pinterest": "https://pinterest.com/jessibradfordphotography",
+    "twitter": "https://twitter.com/jessibradfordphoto",
+    "youtube": "https://youtube.com/@jessibradfordphotography",
+    "tiktok": "https://tiktok.com/@jessibradfordphotography"
+  },
+  "adminSettings": {
+    "emailNotifications": {
+      "newBookings": true,
+      "galleryAccess": true,
+      "weeklyReports": false
+    },
+    "gallerySettings": {
+      "allowDownloads": true,
+      "watermarkPhotos": true,
+      "autoExpireGalleries": false,
+      "expireAfterDays": 30
+    }
+  },
+  "siteSettings": {
+    "defaultSessionDuration": "1.5 hours",
+    "timezone": "Mountain Time (MT)",
+    "currency": "USD ($)",
+    "language": "English",
+    "contactFormEnabled": true,
+    "bookingEnabled": true,
+    "galleryEnabled": true
+  },
+  "seoSettings": {
+    "siteTitle": "Jessi Bradford Photography - Professional Photographer in Salina, Utah",
+    "siteDescription": "Professional photography services in Salina, Utah. Specializing in family portraits, couple sessions, weddings, and events.",
+    "keywords": "photography, photographer, Salina Utah, family portraits, wedding photography, couple sessions"
+  }
+}

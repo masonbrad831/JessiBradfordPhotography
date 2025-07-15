@@ -11,6 +11,8 @@ interface Promotion {
   usageLimit: number;
   usedBy: string[]; // emails that have used this promotion
   allowedSessionTypes: string[];
+  discountType: 'percent' | 'amount' | 'fixed';
+  discountValue: number;
 }
 
 const PromotionsManager: React.FC = () => {
@@ -23,6 +25,8 @@ const PromotionsManager: React.FC = () => {
     description: '',
     usageLimit: 1,
     allowedSessionTypes: [] as string[],
+    discountType: 'percent' as 'percent' | 'amount' | 'fixed',
+    discountValue: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -66,7 +70,7 @@ const PromotionsManager: React.FC = () => {
       setPromotions(updatedPromos);
       setShowModal(false);
       setEditingPromotion(null);
-      setNewPromotion({ code: '', description: '', usageLimit: 1, allowedSessionTypes: [] });
+      setNewPromotion({ code: '', description: '', usageLimit: 1, allowedSessionTypes: [], discountType: 'percent', discountValue: 0 });
       toast.success('Promotion saved');
     } catch (e) {
       toast.error('Failed to save promotion');
@@ -80,6 +84,8 @@ const PromotionsManager: React.FC = () => {
       description: promo.description,
       usageLimit: promo.usageLimit,
       allowedSessionTypes: promo.allowedSessionTypes,
+      discountType: promo.discountType,
+      discountValue: promo.discountValue,
     });
     setShowModal(true);
   };
@@ -106,7 +112,7 @@ const PromotionsManager: React.FC = () => {
           className="btn-primary flex items-center space-x-2"
           onClick={() => {
             setEditingPromotion(null);
-            setNewPromotion({ code: '', description: '', usageLimit: 1, allowedSessionTypes: [] });
+            setNewPromotion({ code: '', description: '', usageLimit: 1, allowedSessionTypes: [], discountType: 'percent', discountValue: 0 });
             setShowModal(true);
           }}
         >
@@ -169,9 +175,9 @@ const PromotionsManager: React.FC = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={e => e.stopPropagation()}
-              className="bg-white rounded-lg shadow-xl w-full max-w-md"
+              className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto"
             >
-              <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
                 <h2 className="text-xl font-semibold text-gray-900">
                   {editingPromotion ? 'Edit Promotion' : 'Add Promotion'}
                 </h2>
@@ -182,6 +188,7 @@ const PromotionsManager: React.FC = () => {
                   <X className="w-5 h-5" />
                 </button>
               </div>
+              
               <form
                 onSubmit={e => {
                   e.preventDefault();
@@ -237,7 +244,47 @@ const PromotionsManager: React.FC = () => {
                     ))}
                   </select>
                 </div>
-                <div className="flex space-x-3 pt-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Discount Type</label>
+                  <select
+                    value={newPromotion.discountType}
+                    onChange={e => setNewPromotion({ ...newPromotion, discountType: e.target.value as 'percent' | 'amount' | 'fixed' })}
+                    className="input-field"
+                  >
+                    <option value="percent">Percent Off (%)</option>
+                    <option value="amount">Amount Off ($)</option>
+                    <option value="fixed">Fixed Price ($)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Discount Value</label>
+                  <input
+                    type="number"
+                    value={newPromotion.discountValue}
+                    onChange={e => setNewPromotion({ ...newPromotion, discountValue: Number(e.target.value) })}
+                    className="input-field"
+                    min={0}
+                    required
+                  />
+                </div>
+                {/* Live Preview */}
+                <div className="bg-gray-50 rounded p-3 mt-2 text-gray-700 text-sm">
+                  {newPromotion.discountType === 'percent' && newPromotion.discountValue > 0 && (
+                    <>This promotion gives <b>{newPromotion.discountValue}% off</b> the selected session(s).</>
+                  )}
+                  {newPromotion.discountType === 'amount' && newPromotion.discountValue > 0 && (
+                    <>This promotion gives <b>${newPromotion.discountValue} off</b> the selected session(s).</>
+                  )}
+                  {newPromotion.discountType === 'fixed' && newPromotion.discountValue > 0 && (
+                    <>This promotion makes the selected session(s) <b>${newPromotion.discountValue}</b> for the customer.</>
+                  )}
+                  {(!newPromotion.discountValue || newPromotion.discountValue <= 0) && (
+                    <>Set a discount value above to see the effect.</>
+                  )}
+                  <br />
+                  <span>Only one promotion can be used per customer. Usage limit: {newPromotion.usageLimit}.</span>
+                </div>
+                <div className="flex space-x-3 pt-4 sticky bottom-0 bg-white border-t border-gray-200 -mx-6 px-6 py-4">
                   <button
                     type="button"
                     onClick={() => setShowModal(false)}

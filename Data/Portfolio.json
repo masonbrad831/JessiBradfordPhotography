@@ -1,0 +1,58 @@
+{
+  "photos": [
+    {
+      "id": "1",
+      "title": "Sample Portrait",
+      "imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+      "category": "portrait",
+      "isActive": true,
+      "isStarred": true,
+      "description": "A beautiful portrait session"
+    },
+    {
+      "id": "2",
+      "title": "Sample Family",
+      "imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+      "category": "family",
+      "isActive": true,
+      "isStarred": true,
+      "description": "Family photography session"
+    },
+    {
+      "id": "3",
+      "title": "Sample Couple",
+      "imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+      "category": "couple",
+      "isActive": true,
+      "isStarred": true,
+      "description": "Couple engagement session"
+    },
+    {
+      "id": "4",
+      "title": "Sample Wedding",
+      "imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+      "category": "wedding",
+      "isActive": true,
+      "isStarred": true,
+      "description": "Wedding photography"
+    },
+    {
+      "id": "5",
+      "title": "Sample Engagement",
+      "imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+      "category": "engagement",
+      "isActive": true,
+      "isStarred": true,
+      "description": "Engagement session"
+    },
+    {
+      "id": "1752538168486",
+      "title": "test",
+      "imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+      "category": "family",
+      "description": "",
+      "isActive": true,
+      "isStarred": true
+    }
+  ]
+}

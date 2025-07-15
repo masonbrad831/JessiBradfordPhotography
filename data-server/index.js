@@ -33,10 +33,27 @@ app.get('/api/:resource', (req, res) => {
   });
 });
 
+function objectWithNumericKeysToArray(obj) {
+  if (
+    obj &&
+    typeof obj === 'object' &&
+    !Array.isArray(obj) &&
+    Object.keys(obj).every(k => !isNaN(Number(k)))
+  ) {
+    // Convert to array, preserving order
+    return Object.keys(obj)
+      .sort((a, b) => Number(a) - Number(b))
+      .map(k => obj[k]);
+  }
+  return obj;
+}
+
 // POST to create/replace data for a resource
 app.post('/api/:resource', (req, res) => {
   const filePath = getFilePath(req.params.resource);
-  fs.writeFile(filePath, JSON.stringify(req.body, null, 2), err => {
+  let data = req.body;
+  data = objectWithNumericKeysToArray(data);
+  fs.writeFile(filePath, JSON.stringify(data, null, 2), err => {
     if (err) return res.status(500).json({ error: 'Server error' });
     res.json({ success: true });
   });
@@ -45,6 +62,24 @@ app.post('/api/:resource', (req, res) => {
 // PATCH to update part of a resource (merge)
 app.patch('/api/:resource', (req, res) => {
   const filePath = getFilePath(req.params.resource);
+  // If the body is an array, just overwrite the file
+  if (Array.isArray(req.body)) {
+    fs.writeFile(filePath, JSON.stringify(req.body, null, 2), err2 => {
+      if (err2) return res.status(500).json({ error: 'Server error' });
+      res.json({ success: true });
+    });
+    return;
+  }
+  // If the body is an object with only numeric keys, convert to array
+  const maybeArray = objectWithNumericKeysToArray(req.body);
+  if (Array.isArray(maybeArray)) {
+    fs.writeFile(filePath, JSON.stringify(maybeArray, null, 2), err2 => {
+      if (err2) return res.status(500).json({ error: 'Server error' });
+      res.json({ success: true });
+    });
+    return;
+  }
+  // Otherwise, merge as before
   fs.readFile(filePath, 'utf8', (err, data) => {
     let current = {};
     if (!err) {

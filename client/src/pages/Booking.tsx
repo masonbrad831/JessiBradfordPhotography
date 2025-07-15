@@ -64,11 +64,6 @@ const Booking: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (promotionCode) handlePromotionCheck();
-    // eslint-disable-next-line
-  }, [promotionCode, formData.service, formData.email, promotions]);
-
-  useEffect(() => {
     async function loadBookings() {
       try {
         setDateCheckLoading(true);
@@ -217,6 +212,20 @@ const Booking: React.FC = () => {
   const fullyBookedDates = bookings
     .filter((b: any) => b.status === 'confirmed')
     .map((b: any) => b.date);
+
+  // Add a helper to calculate the discounted price
+  function getDiscountedPrice(service: any, promo: Promotion | null): number | null {
+    if (!service || !promo) return null;
+    const price = typeof service.price === 'string' ? parseFloat(service.price) : service.price;
+    if (promo.discountType === 'percent') {
+      return Math.max(0, Math.round((price * (1 - promo.discountValue / 100)) * 100) / 100);
+    } else if (promo.discountType === 'amount') {
+      return Math.max(0, Math.round((price - promo.discountValue) * 100) / 100);
+    } else if (promo.discountType === 'fixed') {
+      return Math.max(0, promo.discountValue);
+    }
+    return price;
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -444,9 +453,30 @@ const Booking: React.FC = () => {
                         Apply
                       </button>
                     </div>
+                    {/* Promotion feedback */}
                     {promotionStatus === 'valid' && appliedPromotion && (
                       <div className="text-green-600 mt-2 text-sm">
-                        Promotion applied: {appliedPromotion.description}
+                        <div>
+                          <b>Promotion applied:</b> {appliedPromotion.description}
+                        </div>
+                        {formData.service && services.length > 0 && (
+                          (() => {
+                            const service = services.find(s => s.name === formData.service);
+                            if (!service) return null;
+                            const original = typeof service.price === 'string' ? parseFloat(service.price) : service.price;
+                            const discounted = getDiscountedPrice(service, appliedPromotion);
+                            if (discounted !== null && discounted !== original) {
+                              return (
+                                <div>
+                                  <span>Original price: <s>${original.toFixed(2)}</s></span><br />
+                                  <span>Discounted price: <b>${discounted.toFixed(2)}</b></span>
+                                </div>
+                              );
+                            }
+                            return null;
+                          })()
+                        )}
+                        <div>Only one promotion can be used per customer.</div>
                       </div>
                     )}
                     {promotionStatus === 'invalid' && (

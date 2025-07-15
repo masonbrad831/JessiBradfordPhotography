@@ -204,7 +204,7 @@ const AboutMeManager: React.FC = () => {
   };
 
   return (
-    <div className="space-y-12 max-w-4xl mx-auto">
+    <div className="space-y-12 max-w-4xl mx-auto max-h-[90vh] overflow-y-auto">
       {/* About Me Section */}
       <div className="bg-white rounded-lg shadow p-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Edit About Me</h1>

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence, PanInfo, useMotionValue, useTransform } from 'framer-motion';
 import { ArrowRight, Camera, Heart, Star, MapPin, Users, Clock } from 'lucide-react';
 import { fetchResource } from '../api';
 
@@ -19,6 +19,23 @@ const Home: React.FC = () => {
   const [featuredWorkDescription, setFeaturedWorkDescription] = useState<string>("");
   const [homeIntro, setHomeIntro] = useState<any>(null);
   const [services, setServices] = useState<any[]>([]);
+  const [featuredReviews, setFeaturedReviews] = useState<any[]>([]);
+  const [currentFeaturedIndex, setCurrentFeaturedIndex] = useState(0);
+  const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isReviewDragging, setIsReviewDragging] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const reviewContainerRef = useRef<HTMLDivElement>(null);
+  const dragX = useMotionValue(0);
+  const reviewDragX = useMotionValue(0);
+  const xInput = [0, 100, 200, 300, 400];
+  const background = useTransform(dragX, xInput, [
+    "linear-gradient(90deg, #f0f0f0 0%, #e0e0e0 100%)",
+    "linear-gradient(90deg, #e0e0e0 0%, #d0d0d0 100%)",
+    "linear-gradient(90deg, #d0d0d0 0%, #c0c0c0 100%)",
+    "linear-gradient(90deg, #c0c0c0 0%, #b0b0b0 100%)",
+    "linear-gradient(90deg, #b0b0b0 0%, #a0a0a0 100%)"
+  ]);
 
   useEffect(() => {
     async function loadSlideshowAndFeatured() {
@@ -41,12 +58,17 @@ const Home: React.FC = () => {
         // Fetch session types for services section
         const sessionTypes = await fetchResource('SessionTypes');
         setServices(Array.isArray(sessionTypes) ? sessionTypes : []);
+        // Fetch reviews for testimonials section
+        const reviews = await fetchResource('Review');
+        const allReviews = Array.isArray(reviews) ? reviews : [];
+        setFeaturedReviews(allReviews.filter((r: any) => r.isActive && r.isApproved && r.isFeatured));
       } catch (e) {
         setHeroImages([]);
         setFeaturedPhotos([]);
         setFeaturedWorkDescription("");
         setHomeIntro(null);
         setServices([]);
+        setFeaturedReviews([]);
       }
     }
     loadSlideshowAndFeatured();
@@ -59,6 +81,140 @@ const Home: React.FC = () => {
     }, 8000);
     return () => clearInterval(interval);
   }, [heroImages]);
+
+  // Auto-cycle featured photos if more than 3
+  useEffect(() => {
+    if (featuredPhotos.length <= 3) return;
+    const maxSteps = featuredPhotos.length - 2; // With 6 photos, max steps = 4
+    const interval = setInterval(() => {
+      setCurrentFeaturedIndex((prev) => {
+        const next = prev + 1;
+        // When we reach the end, loop back to start
+        if (next >= maxSteps) {
+          return 0;
+        }
+        return next;
+      });
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [featuredPhotos]);
+
+  // Auto-cycle featured reviews if more than 3
+  useEffect(() => {
+    if (featuredReviews.length <= 3) return;
+    const maxSteps = featuredReviews.length - 2;
+    const interval = setInterval(() => {
+      setCurrentReviewIndex((prev) => {
+        const next = prev + 1;
+        if (next >= maxSteps) {
+          return 0;
+        }
+        return next;
+      });
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [featuredReviews]);
+
+  const getVisiblePhotos = () => {
+    if (featuredPhotos.length <= 3) {
+      return featuredPhotos;
+    }
+    
+    const photos = [];
+    for (let i = 0; i < 3; i++) {
+      const index = (currentFeaturedIndex + i) % featuredPhotos.length;
+      photos.push(featuredPhotos[index]);
+    }
+    return photos;
+  };
+
+  const getVisibleReviews = () => {
+    if (featuredReviews.length <= 3) {
+      return featuredReviews;
+    }
+    
+    const reviews = [];
+    for (let i = 0; i < 3; i++) {
+      const index = (currentReviewIndex + i) % featuredReviews.length;
+      reviews.push(featuredReviews[index]);
+    }
+    return reviews;
+  };
+
+  const handleDragEnd = (event: any, info: PanInfo) => {
+    setIsDragging(false);
+    const threshold = 50;
+    
+    if (info.offset.x > threshold) {
+      // Swipe right - go to previous
+      setCurrentFeaturedIndex((prev) => 
+        prev === 0 ? featuredPhotos.length - 1 : prev - 1
+      );
+    } else if (info.offset.x < -threshold) {
+      // Swipe left - go to next
+      setCurrentFeaturedIndex((prev) => (prev + 1) % featuredPhotos.length);
+    }
+  };
+
+  const handleReviewDragEnd = (event: any, info: PanInfo) => {
+    setIsReviewDragging(false);
+    const threshold = 50;
+    
+    if (info.offset.x > threshold) {
+      setCurrentReviewIndex((prev) => 
+        prev === 0 ? featuredReviews.length - 1 : prev - 1
+      );
+    } else if (info.offset.x < -threshold) {
+      setCurrentReviewIndex((prev) => (prev + 1) % featuredReviews.length);
+    }
+  };
+
+  const goToFeatured = (index: number) => {
+    setCurrentFeaturedIndex(index);
+  };
+
+  // Calculate the transform for smooth continuous sliding
+  const getSlideTransform = () => {
+    if (featuredPhotos.length <= 3) return 0;
+    return -(currentFeaturedIndex * (100 / 3));
+  };
+
+  // Create a transform that combines auto-transition with drag
+  const slideX = useTransform(
+    dragX,
+    (dragValue) => {
+      if (featuredPhotos.length <= 3) return 0;
+      // Since we're only showing 3 photos at a time, we don't need to transform
+      const dragOffset = dragValue / 10; // Scale down drag for smoother feel
+      return `${dragOffset}%`;
+    }
+  );
+
+  const reviewSlideX = useTransform(
+    reviewDragX,
+    (dragValue) => {
+      if (featuredReviews.length <= 3) return 0;
+      const dragOffset = dragValue / 10;
+      return `${dragOffset}%`;
+    }
+  );
+
+  // Create infinite loop photos array
+  const getInfinitePhotos = () => {
+    if (featuredPhotos.length <= 3) {
+      return featuredPhotos;
+    }
+    
+    // Create an array that repeats the photos to create seamless loop
+    const repeatedPhotos = [...featuredPhotos, ...featuredPhotos, ...featuredPhotos];
+    const startIndex = featuredPhotos.length + currentFeaturedIndex;
+    
+    const photos = [];
+    for (let i = 0; i < 3; i++) {
+      photos.push(repeatedPhotos[startIndex + i]);
+    }
+    return photos;
+  };
 
   return (
     <div className="min-h-screen">
@@ -182,34 +338,86 @@ const Home: React.FC = () => {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {featuredPhotos.length === 0 ? (
-              <div className="col-span-full text-center text-wood-600">No featured work yet.</div>
-            ) : featuredPhotos.map((photo, index) => (
+          {featuredPhotos.length === 0 ? (
+            <div className="text-center text-wood-600">No featured work yet.</div>
+          ) : (
+            <div className="relative">
               <motion.div
-                key={photo.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.2 }}
-                viewport={{ once: true }}
-                className="group cursor-pointer"
+                ref={containerRef}
+                drag="x"
+                dragConstraints={{ left: 0, right: 0 }}
+                onDragStart={() => setIsDragging(true)}
+                onDragEnd={handleDragEnd}
+                style={{ x: dragX }}
+                className="cursor-grab active:cursor-grabbing"
               >
-                <div className="aspect-[4/3] bg-wood-200 rounded-lg overflow-hidden mb-4 rustic-border">
-                  <img
-                    src={photo.imageUrl}
-                    alt={photo.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-                <h3 className="text-lg font-semibold text-wood-800 mb-2">
-                  {photo.title}
-                </h3>
-                <p className="text-wood-600 capitalize">
-                  {photo.category} Photography
-                </p>
+                <motion.div 
+                  className="flex gap-4"
+                  style={{ 
+                    width: "100%",
+                    x: slideX 
+                  }}
+                  transition={{ 
+                    duration: 0.75,
+                    ease: "easeInOut"
+                  }}
+                >
+                  {getVisiblePhotos().map((photo, index) => (
+                    <motion.div
+                      key={photo.id}
+                      className="w-1/3"
+                      style={{
+                        transformStyle: "preserve-3d",
+                        perspective: "1000px"
+                      }}
+                    >
+                      <motion.div
+                        className="group cursor-pointer"
+                        whileHover={{ scale: 1.02 }}
+                        transition={{ duration: 0.3 }}
+                        style={{
+                          transformStyle: "preserve-3d"
+                        }}
+                      >
+                        <motion.div 
+                          className="aspect-[1/1] bg-wood-200 rounded-lg overflow-hidden mb-4 rustic-border max-w-xs"
+                          style={{
+                            transformStyle: "preserve-3d"
+                          }}
+                        >
+                          <motion.img
+                            src={photo.imageUrl}
+                            alt={photo.title}
+                            className="w-full h-full object-cover"
+                            initial={{ scale: 1.1 }}
+                            animate={{ scale: 1 }}
+                            transition={{ 
+                              duration: 1,
+                              ease: "easeInOut"
+                            }}
+                          />
+                        </motion.div>
+
+                      </motion.div>
+                    </motion.div>
+                  ))}
+                </motion.div>
               </motion.div>
-            ))}
-          </div>
+
+
+
+              {/* Drag hint */}
+              {featuredPhotos.length > 3 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: isDragging ? 0 : 0.7 }}
+                  className="absolute top-4 right-4 text-xs text-wood-500 bg-white/80 px-2 py-1 rounded"
+                >
+                  Drag to navigate
+                </motion.div>
+              )}
+            </div>
+          )}
 
           <div className="text-center mt-12">
             <Link to="/portfolio" className="btn-secondary">
@@ -289,44 +497,95 @@ const Home: React.FC = () => {
             <p className="text-lg text-wood-600 max-w-2xl mx-auto">
               Hear from families and couples who have experienced my photography
             </p>
+            <p className="text-sm text-wood-500 mt-2">
+              Reviews are only accepted from clients with confirmed bookings
+            </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                name: 'Sarah & Mike',
-                text: 'Jessi captured our family perfectly. The photos are absolutely stunning!',
-                rating: 5
-              },
-              {
-                name: 'Emily & David',
-                text: 'Our engagement session was magical. Jessi made us feel so comfortable.',
-                rating: 5
-              },
-              {
-                name: 'The Johnson Family',
-                text: 'Professional, creative, and so easy to work with. Highly recommend!',
-                rating: 5
-              }
-            ].map((testimonial, index) => (
+          {featuredReviews.length > 0 ? (
+            <div className="relative">
               <motion.div
-                key={testimonial.name}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.2 }}
-                viewport={{ once: true }}
-                className="farmhouse-card"
+                ref={reviewContainerRef}
+                drag="x"
+                dragConstraints={{ left: 0, right: 0 }}
+                onDragStart={() => setIsReviewDragging(true)}
+                onDragEnd={handleReviewDragEnd}
+                style={{ x: reviewDragX }}
+                className="cursor-grab active:cursor-grabbing"
               >
-                <div className="flex items-center mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 text-warm-500 fill-current" />
+                <motion.div 
+                  className="flex gap-4"
+                  style={{ 
+                    width: "100%",
+                    x: reviewSlideX 
+                  }}
+                  transition={{ 
+                    duration: 0.75,
+                    ease: "easeInOut"
+                  }}
+                >
+                  {getVisibleReviews().map((review, index) => (
+                    <motion.div
+                      key={review.id}
+                      className="w-1/3"
+                      style={{
+                        transformStyle: "preserve-3d",
+                        perspective: "1000px"
+                      }}
+                    >
+                      <motion.div
+                        className="group cursor-pointer bg-white rounded-lg shadow-md p-6 h-full"
+                        whileHover={{ scale: 1.02 }}
+                        transition={{ duration: 0.3 }}
+                        style={{
+                          transformStyle: "preserve-3d"
+                        }}
+                      >
+                        <div className="flex items-center gap-2 mb-4">
+                          <div className="flex">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`w-4 h-4 ${
+                                  i < review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
+                                }`}
+                              />
+                            ))}
+                          </div>
+                          <span className="text-sm text-wood-600">({review.rating}/5)</span>
+                        </div>
+                        
+                        <blockquote className="text-wood-700 mb-4 italic">
+                          "{review.comment}"
+                        </blockquote>
+                        
+                        <div className="mt-auto">
+                          <p className="font-semibold text-wood-800">{review.clientName}</p>
+                          <p className="text-sm text-wood-600">{review.serviceType}</p>
+                        </div>
+                      </motion.div>
+                    </motion.div>
                   ))}
-                </div>
-                <p className="text-wood-700 mb-4 italic">"{testimonial.text}"</p>
-                <p className="text-wood-800 font-semibold">{testimonial.name}</p>
+                </motion.div>
               </motion.div>
-            ))}
-          </div>
+
+              {/* Drag hint */}
+              {featuredReviews.length > 3 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: isReviewDragging ? 0 : 0.7 }}
+                  className="absolute top-4 right-4 text-xs text-wood-500 bg-white/80 px-2 py-1 rounded"
+                >
+                  Drag to navigate
+                </motion.div>
+              )}
+            </div>
+          ) : (
+            <div className="text-center text-wood-600 py-12">
+              <p className="text-lg mb-4">No featured reviews yet.</p>
+              <p className="text-sm">Check back soon for client testimonials!</p>
+            </div>
+          )}
 
           <div className="text-center mt-12">
             <Link to="/reviews" className="btn-secondary">

@@ -1,8 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Send, Clock } from 'lucide-react';
+import { fetchResource } from '../api';
+
+interface Settings {
+  businessInfo: {
+    businessName: string;
+    email: string;
+    phone: string;
+    location: string;
+    address: string;
+    website: string;
+  };
+}
 
 const Contact: React.FC = () => {
+  const [settings, setSettings] = useState<Settings>({
+    businessInfo: {
+      businessName: "Jessi Bradford Photography",
+      email: "jessi@jessibradfordphotography.com",
+      phone: "(555) 123-4567",
+      location: "Salina, Utah",
+      address: "123 Main Street, Salina, UT 84654",
+      website: "https://jessibradfordphotography.com"
+    }
+  });
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -11,6 +34,20 @@ const Contact: React.FC = () => {
     date: '',
     message: ''
   });
+
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const data = await fetchResource('Settings');
+        if (data) {
+          setSettings(data);
+        }
+      } catch (e) {
+        console.log('Using default settings for contact page');
+      }
+    }
+    loadSettings();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -183,10 +220,10 @@ const Contact: React.FC = () => {
                   <div>
                     <h3 className="text-lg font-semibold text-sage-800 mb-2">Email</h3>
                     <a
-                      href="mailto:bradford.j.photos@gmail.com"
+                      href={`mailto:${settings.businessInfo.email}`}
                       className="text-sage-600 hover:text-sage-700 transition-colors"
                     >
-                      bradford.j.photos@gmail.com
+                      {settings.businessInfo.email}
                     </a>
                   </div>
                 </div>
@@ -198,10 +235,10 @@ const Contact: React.FC = () => {
                   <div>
                     <h3 className="text-lg font-semibold text-sage-800 mb-2">Phone</h3>
                     <a
-                      href="tel:385-457-6487"
+                      href={`tel:${settings.businessInfo.phone.replace(/\s/g, '')}`}
                       className="text-sage-600 hover:text-sage-700 transition-colors"
                     >
-                      (385) 457-6487
+                      {settings.businessInfo.phone}
                     </a>
                   </div>
                 </div>
@@ -213,8 +250,8 @@ const Contact: React.FC = () => {
                   <div>
                     <h3 className="text-lg font-semibold text-sage-800 mb-2">Location</h3>
                     <p className="text-sage-600">
-                      Salina, Utah<br />
-                      Serving Sevier County and surrounding areas
+                      {settings.businessInfo.location}<br />
+                      {settings.businessInfo.address}
                     </p>
                   </div>
                 </div>
@@ -224,40 +261,13 @@ const Contact: React.FC = () => {
                     <Clock className="w-6 h-6 text-sage-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-sage-800 mb-2">Response Time</h3>
+                    <h3 className="text-lg font-semibold text-sage-800 mb-2">Business Hours</h3>
                     <p className="text-sage-600">
-                      I typically respond within 24 hours during business days
+                      Monday - Friday: 9:00 AM - 6:00 PM<br />
+                      Saturday: 10:00 AM - 4:00 PM<br />
+                      Sunday: By appointment only
                     </p>
                   </div>
-                </div>
-              </div>
-
-              {/* Social Media */}
-              <div className="mt-12">
-                <h3 className="text-lg font-semibold text-sage-800 mb-4">Follow Me</h3>
-                <div className="flex space-x-4">
-                  <a
-                    href="https://facebook.com/JessiBradfordphotography"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-3 bg-sage-100 rounded-full hover:bg-sage-200 transition-colors"
-                  >
-                    <span className="sr-only">Facebook</span>
-                    <svg className="w-6 h-6 text-sage-600" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                    </svg>
-                  </a>
-                  <a
-                    href="https://instagram.com/jessibradfordphotography"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-3 bg-sage-100 rounded-full hover:bg-sage-200 transition-colors"
-                  >
-                    <span className="sr-only">Instagram</span>
-                    <svg className="w-6 h-6 text-sage-600" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987 6.62 0 11.987-5.367 11.987-11.987C24.014 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.448-.49-3.323-1.297C4.198 14.895 3.708 13.744 3.708 12.447s.49-2.448 1.418-3.323c.875-.807 2.026-1.297 3.323-1.297s2.448.49 3.323 1.297c.928.875 1.418 2.026 1.418 3.323s-.49 2.448-1.418 3.244c-.875.807-2.026 1.297-3.323 1.297zm7.718-1.297c-.875.807-2.026 1.297-3.323 1.297s-2.448-.49-3.323-1.297c-.928-.875-1.418-2.026-1.418-3.244s.49-2.448 1.418-3.323c.875-.807 2.026-1.297 3.323-1.297s2.448.49 3.323 1.297c.928.875 1.418 2.026 1.418 3.323s-.49 2.448-1.418 3.244z"/>
-                    </svg>
-                  </a>
                 </div>
               </div>
             </motion.div>

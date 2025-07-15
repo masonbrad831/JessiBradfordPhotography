@@ -38,7 +38,7 @@ function App() {
               </PrivateRoute>
             }>
               <Route index element={<Dashboard />} />
-              <Route path="portfolio" element={<PortfolioManager />} />
+              <Route path="portfolio-manager" element={<PortfolioManager />} />
               <Route path="bookings" element={<BookingManager />} />
               <Route path="client-galleries" element={<ClientGalleryManager />} />
               <Route path="slideshow" element={<SlideshowManager />} />

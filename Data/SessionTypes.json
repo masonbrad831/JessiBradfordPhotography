@@ -31,17 +31,15 @@
     "photoCount": 15
   },
   {
-    "id": "1752518682224",
-    "name": "Mini Session",
+    "id": "1752543134673",
+    "name": "Mini Sessions",
     "price": 100,
     "duration": "30m",
-    "description": "small shit",
+    "description": "Super quick photoshoots if you don't have a lot of time or don't need a big variety ",
     "includes": [
-      "Professional Edititing",
-      "more",
-      "good shit"
+      "Quick Session"
     ],
-    "photoCount": 5,
-    "icon": "Clock"
+    "photoCount": 15,
+    "icon": "Camera"
   }
 ]

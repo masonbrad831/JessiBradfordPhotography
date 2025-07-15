@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Camera, Heart, MapPin, Award, Save, Star } from 'lucide-react';
+import { Camera, Heart, MapPin, Star } from 'lucide-react';
 import { fetchResource } from '../api';
-
-const ICON_MAP: Record<string, any> = {
-  Heart,
-  Camera,
-  Star,
-};
 
 const LOCATION_ICON_MAP: Record<string, any> = {
   MapPin,
   Camera,
   Heart,
+};
+
+const ICON_MAP: Record<string, any> = {
+  Heart,
+  Camera,
+  Star,
 };
 
 const About: React.FC = () => {

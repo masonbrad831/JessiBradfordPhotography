@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Filter, Download, Heart } from 'lucide-react';
+import { Filter, Download, Heart, Star } from 'lucide-react';
 import { fetchResource } from '../api';
 
 const Portfolio: React.FC = () => {
@@ -22,8 +22,12 @@ const Portfolio: React.FC = () => {
     async function loadPhotos() {
       setLoading(true);
       try {
-        const featuredWork = await fetchResource('FeaturedWork');
-        setPhotos(Array.isArray(featuredWork) ? featuredWork : []);
+        const portfolioData = await fetchResource('Portfolio');
+        if (portfolioData && Array.isArray(portfolioData.photos)) {
+          setPhotos(portfolioData.photos.filter((photo: any) => photo.isActive !== false));
+        } else {
+          setPhotos([]);
+        }
       } catch (e) {
         setPhotos([]);
       } finally {
@@ -128,6 +132,11 @@ const Portfolio: React.FC = () => {
                   <p className="text-sage-600 capitalize">
                     {photo.category} Photography
                   </p>
+                  {photo.description && (
+                    <p className="text-sage-500 text-sm mt-2">
+                      {photo.description}
+                    </p>
+                  )}
                 </div>
               </motion.div>
             ))}

@@ -72,4 +72,6 @@ export interface Promotion {
   usageLimit: number;
   usedBy: string[]; // emails that have used this promotion
   allowedSessionTypes: string[];
+  discountType: 'percent' | 'amount' | 'fixed'; // percent = % off, amount = $ off, fixed = fixed price
+  discountValue: number; // percent (e.g. 25), amount (e.g. 75), or fixed price (e.g. 50)
 } 

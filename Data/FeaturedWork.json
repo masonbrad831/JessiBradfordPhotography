@@ -2,27 +2,52 @@
   "sectionDescription": "A glimpse into my artistic vision and the beautiful moments I've captured",
   "items": [
     {
-      "id": "1",
-      "title": "Sample Featured Photo",
-      "imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-      "category": "portrait",
-      "isActive": true
-    },
-    {
-      "id": "1752519385354",
-      "title": "Sample",
+      "id": "1752538168486",
+      "title": "test",
       "imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
       "category": "family",
-      "order": 2,
-      "isActive": true
+      "isActive": true,
+      "order": 1
     },
     {
-      "id": "1752519406261",
-      "title": "Sample",
+      "id": "5",
+      "title": "Sample Engagement",
       "imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
       "category": "engagement",
-      "order": 3,
-      "isActive": true
+      "isActive": true,
+      "order": 2
+    },
+    {
+      "id": "4",
+      "title": "Sample Wedding",
+      "imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+      "category": "wedding",
+      "isActive": true,
+      "order": 3
+    },
+    {
+      "id": "1",
+      "title": "Sample Portrait",
+      "imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+      "category": "portrait",
+      "isActive": true,
+      "order": 4
+    },
+    {
+      "id": "2",
+      "title": "Sample Family",
+      "imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+      "category": "family",
+      "isActive": true,
+      "order": 5
+    },
+    {
+      "id": "3",
+      "title": "Sample Couple",
+      "imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+      "category": "couple",
+      "isActive": true,
+      "order": 6
     }
   ]
 }

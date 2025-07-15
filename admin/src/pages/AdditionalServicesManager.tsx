@@ -116,14 +116,14 @@ const AdditionalServicesManager: React.FC = () => {
       </div>
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 z-50 flex items-center justify-center p-4" onClick={() => setShowModal(false)}>
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
               <h2 className="text-xl font-semibold text-gray-900">{editingService ? 'Edit' : 'Add'} Service</h2>
               <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <div className="space-y-4">
+            <div className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
                 <input
@@ -149,9 +149,14 @@ const AdditionalServicesManager: React.FC = () => {
                   rows={3}
                 />
               </div>
-              <button className="btn-primary w-full mt-2" onClick={handleSave}>
-                <Save className="w-4 h-4 mr-2" /> Save
-              </button>
+              <div className="flex space-x-3 pt-4 sticky bottom-0 bg-white border-t border-gray-200 -mx-6 px-6 py-4">
+                <button type="button" onClick={() => setShowModal(false)} className="flex-1 btn-secondary">
+                  Cancel
+                </button>
+                <button type="button" onClick={handleSave} className="flex-1 btn-primary">
+                  Save
+                </button>
+              </div>
             </div>
           </div>
         </div>

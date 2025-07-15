@@ -1,13 +1,72 @@
 [
   {
     "id": "1752518857404",
+    "bookingId": "1752511344430",
     "clientName": "test",
+    "email": "test@example.com",
     "rating": 5,
-    "comment": "test",
+    "comment": "test1",
     "serviceType": "Family Session",
     "date": "2025-07-14",
     "isActive": true,
     "isFeatured": true,
+    "isApproved": true,
     "order": 1
+  },
+  {
+    "id": "1752518857333",
+    "bookingId": "1752511346333",
+    "clientName": "Jane Doe",
+    "email": "jane@example.com",
+    "rating": 4,
+    "comment": "Great experience! 2",
+    "serviceType": "Portrait Session",
+    "date": "2025-07-15",
+    "isActive": true,
+    "isFeatured": true,
+    "isApproved": true,
+    "order": 2
+  },
+  {
+    "id": "1752518857222",
+    "bookingId": "1752511346123",
+    "clientName": "John Smith",
+    "email": "john@example.com",
+    "rating": 3,
+    "comment": "It was good, but could be better. 3",
+    "serviceType": "Couple Session",
+    "date": "2025-07-16",
+    "isActive": true,
+    "isFeatured": true,
+    "isApproved": true,
+    "order": 3
+  },
+  {
+    "id": "1752518857999",
+    "bookingId": "1752511346999",
+    "clientName": "Alice Johnson",
+    "email": "alice@example.com",
+    "rating": 5,
+    "comment": "Absolutely loved the photos! 4",
+    "serviceType": "Wedding Photography",
+    "date": "2025-07-17",
+    "isActive": true,
+    "isFeatured": false,
+    "isApproved": true,
+    "order": 4
+  },
+  {
+    "id": "1752518857888",
+    "bookingId": "1752511346888",
+    "clientName": "Bob Lee",
+    "email": "bob@example.com",
+    "rating": 2,
+    "comment": "Not what I expected.",
+    "serviceType": "Event Photography",
+    "date": "2025-07-18",
+    "isActive": true,
+    "isFeatured": false,
+    "isApproved": true,
+    "order": 5
   }
 ]
