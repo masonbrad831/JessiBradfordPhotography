@@ -6,14 +6,13 @@ const Contact: React.FC = () => {
   const settings = {
     businessInfo: {
       businessName: "Jessi Bradford Photography",
-      email: "jessi@jessibradfordphotography.com",
-      phone: "(555) 123-4567",
+      email: "bradford.j.photots@gmail.com",
+      phone: "(385) 457-6487",
       location: "Salina, Utah",
-      address: "123 Main Street, Salina, UT 84654",
       website: "https://jessibradfordphotography.com",
       social: {
-        facebook: "https://facebook.com/jessibradfordphotography",
-        instagram: "https://instagram.com/jessibradfordphotography"
+        facebook: "https://www.facebook.com/profile.php?id=61578237507323",
+      instagram: "https://www.instagram.com/jessibradfordphotography"
       }
     }
   };
@@ -82,9 +81,10 @@ const Contact: React.FC = () => {
                       <option value="">Select a service</option>
                       <option value="portrait">Portrait Session</option>
                       <option value="couple">Couple Session</option>
-                      <option value="family">Family Session</option>
-                      <option value="engagement">Engagement Session</option>
-                      <option value="other">Other</option>
+                      <option value="family">Family & Lifestyle</option>
+                      <option value="newborn">Newborn Session</option>
+                      <option value="boudoir">Boudoir Session</option>
+                      <option value="other">Custom</option>
                     </select>
                   </div>
                 </div>
@@ -144,21 +144,6 @@ const Contact: React.FC = () => {
                     <h3 className="text-lg font-semibold text-sage-800 mb-2">Location</h3>
                     <p className="text-sage-600">
                       {settings.businessInfo.location}<br />
-                      {settings.businessInfo.address}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-sage-100 rounded-full flex items-center justify-center">
-                    <Clock className="w-6 h-6 text-sage-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-sage-800 mb-2">Business Hours</h3>
-                    <p className="text-sage-600">
-                      Monday - Friday: 9:00 AM - 6:00 PM<br />
-                      Saturday: 10:00 AM - 4:00 PM<br />
-                      Sunday: By appointment only
                     </p>
                   </div>
                 </div>
