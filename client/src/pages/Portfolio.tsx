@@ -15,7 +15,7 @@ const portfolioData = [
   { id: "senior", title: "Seniors", showOnClient: true, photos: generatePhotos("senior", 14) },
   { id: "maternity", title: "Maternity", showOnClient: true, photos: generatePhotos("maternity", 5) },
   { id: "family", title: "Family", showOnClient: true, photos: generatePhotos("family", 3) },
-  { id: "car", title: "Cars", showOnClient: true, photos: generatePhotos("cars", 8) },
+  { id: "car", title: "Cars", showOnClient: true, photos: generatePhotos("cars", 7) },
   { id: "boudoir", title: "Boudoir", showOnClient: true, photos: generatePhotos("boudoir", 10) },
   { id: "seasonal", title: "Seasonal", showOnClient: true, photos: generatePhotos("seasonal", 5) },
 ];
