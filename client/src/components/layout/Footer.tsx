@@ -7,7 +7,7 @@ const Footer: React.FC = () => {
   const settings = {
     businessInfo: {
       businessName: "Jessi Bradford Photography",
-      email: "bradford.j.photots@gmail.com",
+      email: "bradford.j.photos@gmail.com",
       phone: "(385) 457-6487",
       location: "Salina, Utah",
       website: "https://jessibradfordphotography.com"

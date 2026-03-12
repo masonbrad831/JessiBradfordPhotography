@@ -141,12 +141,16 @@ const Home: React.FC = () => {
         <p className="text-xl text-wood-600 mb-10 max-w-2xl mx-auto italic font-light">
           Available for travel throughout Sevier County and the surrounding areas.
         </p>
-        <Link to="/contact" className="btn-primary inline-block px-12 py-4 rounded-full bg-wood-800 text-white hover:bg-wood-900 transition-all text-lg font-medium">
-          Get in Touch
-        </Link>
-        <Link to="/services" className="btn-primary inline-block px-12 py-4 rounded-full bg-wood-800 text-white hover:bg-wood-900 transition-all text-lg font-medium">
-          My Services
-        </Link>
+        
+        {/* Added this wrapper div to handle spacing and centering */}
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-6">
+          <Link to="/contact" className="btn-primary inline-block px-12 py-4 rounded-full bg-wood-800 text-white hover:bg-wood-900 transition-all text-lg font-medium">
+            Get in Touch
+          </Link>
+          <Link to="/services" className="btn-primary inline-block px-12 py-4 rounded-full bg-wood-800 text-white hover:bg-wood-900 transition-all text-lg font-medium">
+            My Services
+          </Link>
+        </div>
       </section>
     </div>
   );
