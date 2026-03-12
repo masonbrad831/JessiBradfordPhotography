@@ -17,7 +17,7 @@ const portfolioData = [
   { id: "family", title: "Family", showOnClient: true, photos: generatePhotos("family", 3) },
   { id: "car", title: "Cars", showOnClient: true, photos: generatePhotos("cars", 8) },
   { id: "boudoir", title: "Boudoir", showOnClient: true, photos: generatePhotos("boudoir", 10) },
-  { id: "fall", title: "Fall", showOnClient: true, photos: generatePhotos("fall", 5) },
+  { id: "seasonal", title: "Seasonal", showOnClient: true, photos: generatePhotos("seasonal", 5) },
 ];
 
 const Portfolio: React.FC = () => {
@@ -53,7 +53,7 @@ const Portfolio: React.FC = () => {
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
             <h1 className="text-5xl font-serif font-bold mb-6">Portfolio</h1>
             <p className="text-xl text-sage-200 max-w-2xl mx-auto">
-              Explore my collection of moody, artistic photography capturing life's beautiful moments
+              Explore my collection of artistic photography capturing your beautiful moments
             </p>
           </motion.div>
         </div>
