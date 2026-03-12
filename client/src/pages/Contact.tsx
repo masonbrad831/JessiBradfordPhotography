@@ -148,8 +148,8 @@ const Contact: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-sage-800 mb-2">Phone</h3>
-                  <a href="tel:4352019056" className="text-sage-600 hover:text-sage-700 transition-colors">
-                    (435) 201-9056
+                  <a href="tel:3854576487" className="text-sage-600 hover:text-sage-700 transition-colors">
+                    (385) 457-6487
                   </a>
                 </div>
               </div>
@@ -170,7 +170,7 @@ const Contact: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-sage-800 mb-2">Facebook</h3>
-                  <a href="https://facebook.com/jessibradfordphotography" target="_blank" rel="noopener noreferrer" className="text-sage-600 hover:text-sage-700 transition-colors">
+                  <a href="https://www.facebook.com/profile.php?id=61578237507323" target="_blank" rel="noopener noreferrer" className="text-sage-600 hover:text-sage-700 transition-colors">
                     @jessibradfordphotography
                   </a>
                 </div>
