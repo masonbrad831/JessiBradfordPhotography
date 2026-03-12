@@ -1,0 +1,27 @@
+/* footer.css */
+
+.footer-business-name {
+  font-family: 'Serif', sans-serif;
+  font-weight: 600;
+}
+
+.footer-social-icon {
+  transition: background-color 0.3s;
+  padding: 0.5rem;
+  border-radius: 9999px;
+  background-color: #4a4a4a; /* adjust to bg-sage-700 */
+}
+
+.footer-social-icon:hover {
+  filter: brightness(1.1);
+}
+
+.footer-contact-link {
+  transition: color 0.3s;
+}
+
+.footer-bottom-bar {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #2f2f2f; /* adjust to border-sage-700 */
+}

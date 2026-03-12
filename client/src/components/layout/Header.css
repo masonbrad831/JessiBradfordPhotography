@@ -1,0 +1,30 @@
+/* header.css */
+
+.header-logo-link {
+  min-width: 0;
+}
+
+.header-logo-badge {
+  z-index: 10;
+}
+
+.header-logo-img {
+  width: 8rem; /* 32 / 4 = 8rem */
+  height: 8rem;
+  object-fit: contain;
+}
+
+.header-text {
+  padding-left: 10rem; /* 40px * 0.25? adjust as needed */
+  min-width: 0;
+}
+
+.header-text h1 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mobile-nav-bg {
+  background-color: #f3f0e6; /* replace with your logo cream color if different */
+}

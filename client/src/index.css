@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: theme('colors.logo-cream.DEFAULT');
+    color: theme('colors.logo-brown.DEFAULT');
+    background-image: none;
+    line-height: 1.6;
+  }
+
+  /* Improved focus states for better accessibility */
+  *:focus {
+    outline: 2px solid theme('colors.logo-sage.DEFAULT');
+    outline-offset: 2px;
+  }
+
+  /* Better button focus states */
+  button:focus,
+  a:focus {
+    outline: 2px solid theme('colors.logo-sage.DEFAULT');
+    outline-offset: 2px;
+  }
+
+  /* Smooth transitions for all interactive elements */
+  * {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-logo-terracotta text-white font-medium py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:bg-logo-brown focus:ring-2 focus:ring-logo-sage focus:ring-offset-2;
+  }
+  
+  .btn-secondary {
+    @apply bg-transparent border-2 border-logo-green text-logo-green hover:bg-logo-green hover:text-white font-medium py-3 px-6 rounded-lg transition-all duration-300 focus:ring-2 focus:ring-logo-sage focus:ring-offset-2;
+  }
+  
+  .section-padding {
+    @apply py-20 px-4 sm:px-6 lg:px-8;
+  }
+  
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  .text-gradient {
+    @apply bg-gradient-to-r from-logo-green to-logo-sage bg-clip-text text-transparent;
+  }
+  
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-2 focus:ring-2 focus:ring-logo-sage focus:ring-offset-2;
+  }
+  
+  .farmhouse-card {
+    @apply bg-white/80 backdrop-blur-sm border border-logo-sage rounded-lg shadow-md p-6 transition-all duration-300 hover:shadow-lg;
+  }
+  
+  .vintage-text {
+    @apply font-vintage text-logo-brown;
+  }
+  
+  .rustic-border {
+    @apply border-2 border-logo-sage rounded-lg;
+  }
+  
+  .wood-texture {
+    background-image: none;
+  }
+
+  /* Comfort improvements */
+  .comfortable-spacing {
+    @apply space-y-8;
+  }
+
+  .comfortable-text {
+    @apply leading-relaxed;
+  }
+
+  .comfortable-card {
+    @apply bg-white rounded-lg shadow-md p-6 border border-logo-sage/20 hover:shadow-lg transition-all duration-300;
+  }
+
+  .comfortable-input {
+    @apply w-full px-4 py-3 border border-logo-sage/30 rounded-lg focus:ring-2 focus:ring-logo-sage focus:border-transparent transition-all duration-300;
+  }
+
+  .comfortable-button {
+    @apply px-6 py-3 rounded-lg font-medium transition-all duration-300 focus:ring-2 focus:ring-logo-sage focus:ring-offset-2;
+  }
+} 
