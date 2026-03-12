@@ -6,12 +6,12 @@ import { Camera, Heart, Users, Baby, GraduationCap, Sparkles, ChevronLeft, Chevr
 const HERO_IMAGES = [
   '/images/cars/03.jpg',
   '/images/family/02.jpg',
-  '/images/fall/02.jpg'
+  '/images/seasonal/02.jpg'
 ];
 
 const FEATURED_PHOTOS = [
-  { id: 1, imageUrl: '/images/fall/04.jpg', title: 'Seasonal' },
-  { id: 2, imageUrl: '/images/cars/03.jpg', title: 'Cars' },
+  { id: 1, imageUrl: '/images/seasonal/04.jpg', title: 'Seasonal' },
+  { id: 2, imageUrl: '/images/cars/02.jpg', title: 'Cars' },
   { id: 3, imageUrl: '/images/senior/08.jpg', title: 'Seniors' },
   { id: 4, imageUrl: '/images/boudoir/03.jpg', title: 'Boudoir' },
   { id: 5, imageUrl: '/images/maternity/03.jpg', title: 'Maternity' },
