@@ -1,12 +1,5 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Camera, Heart, MapPin } from 'lucide-react';
-
-const LOCATION_ICON_MAP: Record<string, any> = {
-  MapPin,
-  Camera,
-  Heart,
-}
 
 const aboutMeContent = {
   text: `I’m Jessi, the photographer behind Jessi Bradford Photography. I’m a lifestyle photographer based in Sevier County who loves capturing the real, meaningful moments that make your story yours. My style is natural, warm, and relaxed. I focus on genuine connection rather than stiff poses, so your photos feel authentic and timeless. As a mom myself, I know how quickly the little moments pass. Those are the moments I love preserving most. My goal during every session is to make you feel comfortable, have fun, and walk away with images that truly feel like you. Whether it’s families, couples, seniors, or everyday life moments, I’m here to capture memories you’ll want to look back on for years.`,

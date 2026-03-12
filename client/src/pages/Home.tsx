@@ -19,8 +19,6 @@ const FEATURED_PHOTOS = [
   { id: 7, imageUrl: '/images/portrait/02.jpg', title: 'Portraits' },
 ];
 
-const ICON_MAP: Record<string, any> = { Camera, Heart, Users, Baby, GraduationCap, Sparkles };
-
 const Home: React.FC = () => {
   const [heroIndex, setHeroIndex] = useState(0);
   const [featureIndex, setFeatureIndex] = useState(0);
@@ -156,13 +154,5 @@ const Home: React.FC = () => {
   );
 };
 
-const SERVICES = [
-  { id: 1, name: 'Portrait', icon: 'Camera', description: 'Personal sessions designed to capture your personality naturally.' },
-  { id: 2, name: 'Couples', icon: 'Heart', description: 'Highlighting the connection, laughter, and love between partners.' },
-  { id: 3, name: 'Family', icon: 'Users', description: 'Authentic moments capturing genuine everyday connections.' },
-  { id: 4, name: 'Newborn', icon: 'Baby', description: 'Soft, intimate sessions focused on those first precious days.' },
-  { id: 5, name: 'Maternity', icon: 'Sparkles', description: 'Celebrating the anticipation and joy of welcoming new life.' },
-  { id: 6, name: 'Seniors', icon: 'GraduationCap', description: 'Showcasing your personality during this milestone moment.' }
-];
 
 export default Home;
