@@ -7,15 +7,14 @@ const Footer: React.FC = () => {
   const settings = {
     businessInfo: {
       businessName: "Jessi Bradford Photography",
-      email: "jessi@jessibradfordphotography.com",
-      phone: "(555) 123-4567",
+      email: "bradford.j.photots@gmail.com",
+      phone: "(385) 457-6487",
       location: "Salina, Utah",
-      address: "123 Main Street, Salina, UT 84654",
       website: "https://jessibradfordphotography.com"
     },
     socialMedia: {
-      facebook: "https://facebook.com/jessibradfordphotography",
-      instagram: "https://instagram.com/jessibradfordphotography",
+      facebook: "https://www.facebook.com/profile.php?id=61578237507323",
+      instagram: "https://www.instagram.com/jessibradfordphotography",
       pinterest: "",
       twitter: "",
       youtube: "",
@@ -46,7 +45,7 @@ const Footer: React.FC = () => {
               </div>
             </div>
             <p className="text-sage-200 mb-4 max-w-md">
-              Capturing life's beautiful moments with a moody, artistic approach. Specializing in portraits, couples, and family photography in {settings.businessInfo.location}.
+              Capturing your beautiful moments with an artistic approach. Specializing in portraits and lifestyle photography in Sevier County.
             </p>
             {socialLinks.length > 0 && (
               <div className="flex space-x-4">
@@ -95,7 +94,6 @@ const Footer: React.FC = () => {
                 <MapPin className="w-5 h-5 text-sage-300" />
                 <span className="text-sage-200">
                   {settings.businessInfo.location}<br />
-                  {settings.businessInfo.address}
                 </span>
               </div>
             </div>
@@ -105,7 +103,7 @@ const Footer: React.FC = () => {
 
         <div className="footer-bottom-bar text-center mt-8">
           <p className="text-sage-300">
-            © {new Date().getFullYear()} {settings.businessInfo.businessName}. All rights reserved.
+            © 2025 {settings.businessInfo.businessName}. All rights reserved.
           </p>
         </div>
       </div>
